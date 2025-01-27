@@ -59,3 +59,5 @@ Other sources?
 
 Support other package mangers
   * https://pypi.org/project/migrate-to-uv/
+
+Add `payne uninstall`

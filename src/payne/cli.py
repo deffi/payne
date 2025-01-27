@@ -6,13 +6,8 @@ app = App()
 
 
 @app.command
-def install(name_or_path: str, version: str | None = None, /):
-    print(f"{name_or_path} {version}")
-
-
-@app.command
-def uninstall(name: str, version: str | None = None, /):
-    print(f"{name} {version}")
+def install(path: str, version: str | None = None, /):
+    ...
 
 
 if __name__ == "__main__":
