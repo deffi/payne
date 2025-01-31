@@ -1,6 +1,4 @@
-# TODO
-
-## Basic functionality
+# Basic functionality
 
 Verify in pyproject.toml:
   * Version must exist
@@ -32,7 +30,7 @@ Call uv:
   * If that doesn't work, then use `uv add -r` with temporary requirements
 
 
-## Desired functionality
+# Desired functionality
 
 Find uv executable
   * `--uv`
@@ -46,12 +44,12 @@ Find uv executable
 Support older Poetry 1: scripts in `tool.poetry.scripts`
 
 
-## Open questions
+# Open questions
 
 Can uv have a dynamic version in `pyproject.toml`? 
 
 
-## Future work
+# Future work
 
 Support packages from PyPI
   * Download sdist
