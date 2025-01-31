@@ -189,6 +189,78 @@ Build backends (e.g., Poetry 1) might use non-standard configuration in
 backends which we don't handle.
 
 
+# Name conflicts
+
+Unless we can define the behavior, we should reject installation of the whole
+app if a conflict is detected.
+
+
+## Package names and versions
+
+We append the version to the (distribution) package name, separated by some
+string (e.g., a single dash: `foo-1.0.0`).
+
+A conflict can occur if the separator string occurs multiple times in the full
+name, and it can't be determined which one is the separate because the separator
+string could be part of both the name and the version. For example, with
+separator string `"-"`:
+  * foo version 1-2
+  * foo-1 version 2
+Both of these would result in the directory name foo-1-1.
+
+We could get around this by replacing all dashes in the name with underscores.
+Since PyPI doesn't allow different package names that normalize to the same
+name, we know that the first dash in the full name is the separator, even if a
+dash appears in the version. Therefore, there can't be any conflicts.
+https://packaging.python.org/en/latest/specifications/name-normalization/
+
+We could also separate the version with a tilde, which is not allowed in package
+names (nor versions).
+
+The user is not expected to interact with the tool directories directly, so this
+would not be a big problem. We would, however, need to store the original name
+in the app metadata for presentation to the user.
+
+
+## Script names and versions
+
+We can get the same conflict between scripts with appended version if the
+version contains a dash:
+  * foo version 1-2
+  * foo-1 version 2
+
+Here, replacing dashes with underscores is not an option because we don't want
+to modify the script names.
+
+Separating the version with a tilde would be possible because the version can't
+contain a tilde.
+https://packaging.python.org/en/latest/specifications/version-specifiers/
+
+
+## Same script in multiple apps
+
+Multiple packages can declare the same script. This will cause a conflict.
+
+We could get around this by appending the package name; e.g.
+`frob-frobnicate-1.0.0` (package `frobnicate` with script `frob`)
+
+This could cause more conflicts, e.g.:
+  * Package `bar-baz`, script `foo`
+  * Package `baz`, script `foo-bar`
+Both would result in `foo-bar-baz-1.0.0`.
+
+We could probably use a tilde here because while the script name can contain
+one, neither the package name nor the version can.
+
+But we would only want to do this in case of an actual conflict, and this means
+that on conflict
+  * Either one of the names would change
+  * Or the result would depend on the order in which the packages were installed
+
+In case of a conflict, we might allow the user to replace or modify the name. In
+this case, we'll need to store the mapping in the metadata. 
+
+
 # Summary
 
 We need to actually install the locked versions
@@ -202,9 +274,17 @@ App installation directories would cause conflicts
     * Rename source directory
     * Explicitly configure source directory
 
-Summary: we need to change the wrapper names
+We need to change the wrapper names
   * Rename after installation
   * Change script names in `pyproject.toml`
+
+Conflicts can occur
+  * Between package-version names
+    * Replace dashes in project name with underscores
+    * Use package~version instead
+  * Between script-version names
+    * Use script~version instead
+  * Between scripts of different packages
 
 
 # Decision
@@ -217,3 +297,9 @@ Therefore, the only option is:
     directory name mismatch and has some additional advantages
   * Rename the wrappers after installation (and therefore install them to a
     temporary bin directory first)
+
+We don't handle conflicts related to the version for now. They are probably
+pretty rare. If one is detected, we reject the installation.
+
+We don't handle conflicts between scripts of different packages for now. They
+are probably semi-rare. If one is detected, we reject the installation.
