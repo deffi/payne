@@ -28,6 +28,7 @@ Generate temporary `requirements.txt` with  locked dependency version
 
 Call uv:
   * `uv tool install --constraints $temp_requirements --from $temp_dir $project-name`
+  * Will --constraints work for indirect dependencies?
   * If that doesn't work, then use `uv add -r` with temporary requirements
 
 
@@ -73,3 +74,5 @@ Allow requesting a coarser version. E.g., request version 1 and get 1.0.0.
     that there is only one such version?
   * Should we do updates of such a version?
   * Should we install into `foo-1` or `foo-1.0.0`?
+
+Handle conflicts between multiple packages that declare the same script
