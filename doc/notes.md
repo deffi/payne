@@ -77,11 +77,21 @@ Therefore, the names from multiple versions will conflict.
 ## Solution: rename wrappers after installation
 
 We could install the app first, and then rename the wrapper to append the
-version.
+version. But we'd have to install to a temporary bin directory first because
+otherwise...
+  * ...we might overwrite something that's already there (assuming a shared bin
+    directory)
+  * ...we would have to check the script names in `pyproject.toml`
+  * ...we might not be sure what we installed and therefore have to uninstall
 
 This would require us to find them in the first place, handle the case where the
 name is already present (will uv overwrite it or skip it?), and handle
 uninstallation.
+
+The advantage is that it would work with any build backend, even standard non-
+compliant ones like Poetry 1. We could also install wheels directly from PyPI
+(except, of course, that we'd still have to check the sdist for the locked
+dependency versions).
 
 
 ## Solution: change script names
