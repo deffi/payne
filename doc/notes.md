@@ -77,6 +77,9 @@ Uv installs all tools below the tool directory (`UV_TOOL_DIR`), in a directory
 whose name is the project name and can't be overridden. Therefore, installing
 multiple versions of an app would lead to conflicts.
 
+Note that we can't move the installation directory after using `uv tool install`
+because the paths in the wrappers would become invalid.
+
 
 ### Solution: separate tool directories for each app
 
