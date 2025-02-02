@@ -1,3 +1,4 @@
+from collections.abc import Iterator
 from functools import cached_property
 import json
 from importlib.metadata import metadata
@@ -22,35 +23,37 @@ class Payne:
     def bin_dir(self):
         return Path.home() / ".local" / "bin"
 
+    @cached_property
+    def uv_binary(self) -> Path:
+        return Path(shutil.which("uv"))  # TODO better
+
     def status(self):
         print(f"Apps directory: {self.apps_dir}")
         print(f"Bin directory:  {self.bin_dir}")
 
+    def install_scripts(self, app: App, source_dir: Path) -> Iterator[Path]:
+        for source_script in source_dir.iterdir():
+            script = self.bin_dir / app.script_file_name(source_script)
+            shutil.move(source_script, script)
+            yield script
+
     def install_from_local(self, source_path: Path):
         pyproject = Pyproject.load(source_path / "pyproject.toml")
+        app = App(self, pyproject.name(), pyproject.version())
 
-        project_name = pyproject.name()
-        project_version = pyproject.version()
-
-        app = App(self, project_name, project_version)
-
-        print(f"Install {project_name} {project_version} from {source_path}")
-
-        app_metadata = AppMetadata()
+        print(f"Install {app.name} {app.version} from {source_path}")
 
         with TemporaryDirectory() as temp_dir:
             temp_dir = Path(temp_dir)
-            uv = Uv(Path(shutil.which("uv")), tool_dir=app.app_dir, tool_bin_dir=temp_dir)
-            uv.tool_install_local(source_path, project_name, extra_path=[temp_dir])
+            uv = Uv(self.uv_binary, tool_dir=app.app_dir, tool_bin_dir=temp_dir)
+            uv.tool_install_local(source_path, app.name, extra_path=[temp_dir])
+            scripts = self.install_scripts(app, temp_dir)
 
-            for temp_script in Path(temp_dir).iterdir():
-                script = self.bin_dir / app.script_file_name(temp_script)
-                shutil.move(temp_script, script)
-                app_metadata.scripts.append(script)
+            app_metadata = AppMetadata()
+            app_metadata.scripts.extend(scripts)
+            app.write_metadata(app_metadata)
 
-        app.write_metadata(app_metadata)
-
-        # TODO roll back if it fails
+        # TODO roll back if it fails (e.g., script already exists)
 
     def uninstall(self, package_name: str, version: str):
         app = App(self, package_name, version)
@@ -62,6 +65,8 @@ class Payne:
         for script in app_metadata.scripts:
             script.unlink(missing_ok=True)
 
+        # Use a temporary tool bin dir for uv so it doesn't uninstall scripts
+        # that we didn't install
         with TemporaryDirectory() as temp_dir:
             temp_dir = Path(temp_dir)
             uv = Uv(Path(shutil.which("uv")), tool_dir=app.app_dir, tool_bin_dir=temp_dir)
@@ -71,10 +76,9 @@ class Payne:
         for app_dir in self.apps_dir.iterdir():
             app_name = app_dir.name
             for version_dir in app_dir.iterdir():
-                app_version = version_dir.name
-                print(f"{app_name} {app_version}")
+                app = App(self, app_name, version_dir.name)
 
-                app = App(self, app_name, app_version)
+                print(f"{app.name} {app.version}")
                 app_metadata = app.read_metadata()
 
                 for script in app_metadata.scripts:

@@ -68,6 +68,7 @@ Find uv executable
 
 Identify apps directory like uv
 
+Store script md5sum in metadata and don't delete it if it was changed
 
 # Open questions
 
