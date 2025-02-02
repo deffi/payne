@@ -1,17 +1,5 @@
 # Basic functionality
 
-## Test data
-
-Without dependencies
-  * Application foo
-    * 1.0.0
-    * 1.1.0
-
-With dependencies
-  * Library bar
-  * Library baz
-
-
 ## Common
 
 Identify paths:
@@ -19,36 +7,26 @@ Identify paths:
   * bin directory: ~/.local/bin
 
 
-## Installing from local dir
+## Installing from package index
 
-Read `pyproject.toml`:
-  * `project.dynamic` must not contain `"version"`
-  * Read `project.name`
-  * Read `project.version`
+Similar, but without `--from`
+
+
+## Locked dependencies
+
+Test data with dependencies
+
+When installing von pacakge index:
+  * Fetch sdist to temporary directory
 
 Generate temporary `requirements.txt` with  locked dependency version
   * `uv export --no-dev --no-emit-project --frozen --no-header --no-hashes --out-file $temp_requirements`
 
-Call uv:
-  * Set UV_TOOL_DIR to $apps-dir/$project-name
-  * Set UV_BIN_DIR to temporary dir
-  * `uv tool install --constraints $temp_requirements --from $temp_dir $project-name`
+Installation:
+  * `uv tool install --constraints $temp_requirements ...`
     * Will --constraints work for indirect dependencies?
     * If that doesn't work, then use `uv add -r` with temporary requirements
-  * Rename and move wrappers from temporary UV_BIN_DIR to bin dir
 
-
-## Installing from package index
-
-Fetch sdist to temporary directory
-
-Generate temporary `requirements.txt` with  locked dependency version
-
-Call uv:
-  * Set UV_TOOL_DIR
-  * Set UV_BIN_DIR to temporary dir
-  * `uv tool install --constraints $temp_requirements $project-name`
-  * Rename and move wrappers from temporary UV_BIN_DIR to bin dir
 
 
 # Desired functionality
