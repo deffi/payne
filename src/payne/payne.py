@@ -1,12 +1,13 @@
 from functools import cached_property
 import json
+from importlib.metadata import metadata
 from pathlib import Path
 import shutil
 from tempfile import TemporaryDirectory
 import tomllib
 
 
-from payne import Uv, App, Pyproject
+from payne import Uv, App, Pyproject, AppMetadata
 
 
 class Payne:
@@ -35,7 +36,7 @@ class Payne:
 
         print(f"Install {project_name} {project_version} from {source_path}")
 
-        scripts = []
+        app_metadata = AppMetadata()
 
         with TemporaryDirectory() as temp_dir:
             temp_dir = Path(temp_dir)
@@ -45,13 +46,9 @@ class Payne:
             for temp_script in Path(temp_dir).iterdir():
                 script = self.bin_dir / app.script_file_name(temp_script)
                 shutil.move(temp_script, script)
-                scripts.append(script)
+                app_metadata.scripts.append(script)
 
-        metadata = {
-            "bin_files": [str(bin_file) for bin_file in scripts],
-        }
-
-        app.write_metadata(metadata)
+        app.write_metadata(app_metadata)
 
         # TODO roll back if it fails
 
@@ -60,11 +57,10 @@ class Payne:
 
         print(f"Uninstall {package_name} {version}")
 
-        metadata = app.read_metadata()
-        bin_files = [Path(bin_file) for bin_file in metadata["bin_files"]]
+        app_metadata = app.read_metadata()
 
-        for bin_file in bin_files:
-            bin_file.unlink(missing_ok=True)
+        for script in app_metadata.scripts:
+            script.unlink(missing_ok=True)
 
         with TemporaryDirectory() as temp_dir:
             temp_dir = Path(temp_dir)
@@ -78,9 +74,8 @@ class Payne:
                 app_version = version_dir.name
                 print(f"{app_name} {app_version}")
 
-                metadata_file = version_dir / "payne_app.json"
-                metadata = json.loads(metadata_file.read_text())
-                bin_files = [Path(bin_file) for bin_file in metadata["bin_files"]]
+                app = App(self, app_name, app_version)
+                app_metadata = app.read_metadata()
 
-                for bin_file in bin_files:
-                    print(f"  - {bin_file.name}")
+                for script in app_metadata.scripts:
+                    print(f"  - {script.name}")

@@ -3,6 +3,8 @@ import json
 from pathlib import Path
 from typing import TYPE_CHECKING
 
+from payne import AppMetadata
+
 if TYPE_CHECKING:
     from payne import Payne
 
@@ -21,12 +23,13 @@ class App:
     def metadata_file(self) -> Path:
         return self.app_dir / "payne_app.json"
 
-    def write_metadata(self, metadata: dict):
-        self.metadata_file.write_text(json.dumps(metadata))
+    def write_metadata(self, metadata: AppMetadata):
+        self.metadata_file.write_text(json.dumps(metadata.dump()))
 
-    def read_metadata(self) -> dict:
+    def read_metadata(self) -> AppMetadata:
         metadata_file = self.app_dir / "payne_app.json"
-        return json.loads(metadata_file.read_text())
+        data = json.loads(metadata_file.read_text())
+        return AppMetadata.parse(data)
 
     def script_file_name(self, original: Path) -> str:
         stem_with_version = f"{original.stem}-{self._version}"
