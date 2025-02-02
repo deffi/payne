@@ -35,23 +35,20 @@ class Payne:
 
         print(f"Install {project_name} {project_version} from {source_path}")
 
-        bin_files = []
+        scripts = []
 
         with TemporaryDirectory() as temp_dir:
             temp_dir = Path(temp_dir)
             uv = Uv(Path(shutil.which("uv")), tool_dir=app.app_dir, tool_bin_dir=temp_dir)
             uv.tool_install_local(source_path, project_name, extra_path=[temp_dir])
 
-            for bin_file in Path(temp_dir).iterdir():
-                bin_file: Path
-                stem_with_version = f"{bin_file.stem}-{project_version}"
-                name_with_version = bin_file.with_stem(stem_with_version).name
-                bin_target_file = self.bin_dir / name_with_version
-                shutil.move(bin_file, bin_target_file)
-                bin_files.append(bin_target_file)
+            for temp_script in Path(temp_dir).iterdir():
+                script = self.bin_dir / app.script_file_name(temp_script)
+                shutil.move(temp_script, script)
+                scripts.append(script)
 
         metadata = {
-            "bin_files": [str(bin_file) for bin_file in bin_files],
+            "bin_files": [str(bin_file) for bin_file in scripts],
         }
 
         app.write_metadata(metadata)

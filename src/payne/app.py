@@ -27,3 +27,7 @@ class App:
     def read_metadata(self) -> dict:
         metadata_file = self.app_dir / "payne_app.json"
         return json.loads(metadata_file.read_text())
+
+    def script_file_name(self, original: Path) -> str:
+        stem_with_version = f"{original.stem}-{self._version}"
+        return original.with_stem(stem_with_version).name
