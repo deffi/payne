@@ -86,8 +86,8 @@ because the paths in the wrappers would become invalid.
 We could install each app to a different directory by setting `UV_TOOL_DIR`.
 
 For example, for installing `foo` version 1.0.0, we could set `UV_TOOL_DIR` to
-`~/.local/share/payne/apps/foo-1.0.0`. We'd get another subdirectory from uv, so
-the app would end up in `~/.local/share/payne/apps/foo-1.0.0/foo`, which seems
+`~/.local/share/payne/apps/foo/1.0.0`. We'd get another subdirectory from uv, so
+the app would end up in `~/.local/share/payne/apps/foo/1.0.0/foo`, which seems
 acceptable (it might even come in handy if we want to add metadata, and it would
 avoid polluting the actual uv tool directory).
 
@@ -200,13 +200,14 @@ app if a conflict is detected.
 
 ## Package names and versions
 
-We append the version to the (distribution) package name, separated by some
-string (e.g., a single dash: `foo-1.0.0`).
+For the application directory, we create a directory for the application and a
+subdirectory for the version (e.g., `foo/1.0.0`). This avoid conflicts.
 
-A conflict can occur if the separator string occurs multiple times in the full
-name, and it can't be determined which one is the separate because the separator
-string could be part of both the name and the version. For example, with
-separator string `"-"`:
+If we were to append the version to the (distribution) package name, separated
+by some string (e.g., a single dash: `foo-1.0.0`), a conflict could occur if the
+separator string occurs multiple times in the full name, and it couldn't be
+determined which one is the separate because the separator string could be part
+of both the name and the version. For example, with separator string `"-"`:
   * foo version 1-2
   * foo-1 version 2
 Both of these would result in the directory name foo-1-1.
@@ -301,8 +302,11 @@ Therefore, the only option is:
   * Rename the wrappers after installation (and therefore install them to a
     temporary bin directory first)
 
-We don't handle conflicts related to the version for now. They are probably
-pretty rare. If one is detected, we reject the installation.
+We avoid conflicts related to the package name and version by installing each
+version below a separate tool directory.
+
+We don't handle conflicts related to script names and version for now. They are
+probably pretty rare. If one is detected, we reject the installation.
 
 We don't handle conflicts between scripts of different packages for now. They
 are probably semi-rare. If one is detected, we reject the installation.
