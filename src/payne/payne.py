@@ -6,7 +6,7 @@ from tempfile import TemporaryDirectory
 import tomllib
 
 
-from payne import Uv, App
+from payne import Uv, App, Pyproject
 
 
 class Payne:
@@ -26,13 +26,10 @@ class Payne:
         print(f"Bin directory:  {self.bin_dir}")
 
     def install_from_local(self, source_path: Path):
-        pyproject_toml = source_path / "pyproject.toml"
+        pyproject = Pyproject.load(source_path / "pyproject.toml")
 
-        pyproject = tomllib.loads(pyproject_toml.read_text())
-
-        assert "version" not in pyproject.get("dynamic", [])
-        project_name = pyproject["project"]["name"]
-        project_version = pyproject["project"]["version"]
+        project_name = pyproject.name()
+        project_version = pyproject.version()
 
         app = App(self, project_name, project_version)
 
