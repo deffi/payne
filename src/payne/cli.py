@@ -100,5 +100,23 @@ def uninstall(package_name: str, version: str):
         subprocess.call(command, env=env)
 
 
+@app.command
+def list_():
+    apps_dir = Path.home() / ".local" / "share" / "payne" / "apps"  # TODO better
+
+    for app_dir in apps_dir.iterdir():
+        app_name = app_dir.name
+        for version_dir in app_dir.iterdir():
+            app_version = version_dir.name
+            print(f"{app_name} {app_version}")
+
+            metadata_file = version_dir / "payne_app.json"
+            metadata = json.loads(metadata_file.read_text())
+            bin_files = [Path(bin_file) for bin_file in metadata["bin_files"]]
+
+            for bin_file in bin_files:
+                print(f"  - {bin_file.name}")
+
+
 if __name__ == "__main__":
     sys.exit(app())
