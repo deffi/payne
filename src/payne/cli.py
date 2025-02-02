@@ -9,6 +9,11 @@ app = App()
 
 
 @app.command
+def status():
+    Payne().status()
+
+
+@app.command
 def install(*, from_: Path):
     Payne().install_from_local(from_)
 

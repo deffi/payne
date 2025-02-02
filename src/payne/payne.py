@@ -23,10 +23,11 @@ class Payne:
     def app_dir(self, app_name: str, app_version: str):
         return self.apps_dir / app_name / app_version
 
-    def install_from_local(self, source_path: Path):
+    def status(self):
         print(f"Apps directory: {self.apps_dir}")
         print(f"Bin directory:  {self.bin_dir}")
 
+    def install_from_local(self, source_path: Path):
         pyproject_toml = source_path / "pyproject.toml"
 
         pyproject = tomllib.loads(pyproject_toml.read_text())
@@ -74,9 +75,6 @@ class Payne:
         # TODO roll back if it fails
 
     def uninstall(self, package_name: str, version: str):
-        print(f"Apps directory: {self.apps_dir}")
-        print(f"Bin directory:  {self.bin_dir}")
-
         app_dir = self.app_dir(package_name, version)
 
         print(f"Uninstall {package_name} {version}")
