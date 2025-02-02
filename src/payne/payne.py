@@ -1,3 +1,4 @@
+from functools import cached_property
 import json
 import os
 from pathlib import Path
@@ -11,13 +12,20 @@ class Payne:
     def __init__(self):
         ...
 
+    @cached_property
+    def apps_dir(self):
+        return Path.home() / ".local" / "share" / "payne" / "apps"  # TODO better
+
+    @cached_property
+    def bin_dir(self):
+        return Path.home() / ".local" / "bin"
+
+    def app_dir(self, app_name: str, app_version: str):
+        return self.apps_dir / app_name / app_version
+
     def install_from_local(self, source_path: Path):
-
-        apps_dir = Path.home() / ".local" / "share" / "payne" / "apps"  # TODO better
-        bin_dir = Path.home() / ".local" / "bin"
-
-        print(f"Apps directory: {apps_dir}")
-        print(f"Bin directory:  {bin_dir}")
+        print(f"Apps directory: {self.apps_dir}")
+        print(f"Bin directory:  {self.bin_dir}")
 
         pyproject_toml = source_path / "pyproject.toml"
 
@@ -27,7 +35,7 @@ class Payne:
         project_name = pyproject["project"]["name"]
         project_version = pyproject["project"]["version"]
 
-        app_dir = apps_dir / project_name / project_version
+        app_dir = self.app_dir(project_name, project_version)
 
         print(f"Install {project_name} {project_version} from {source_path}")
 
@@ -52,7 +60,7 @@ class Payne:
                 bin_file: Path
                 stem_with_version = f"{bin_file.stem}-{project_version}"
                 name_with_version = bin_file.with_stem(stem_with_version).name
-                bin_target_file = bin_dir / name_with_version
+                bin_target_file = self.bin_dir / name_with_version
                 shutil.move(bin_file, bin_target_file)
                 bin_files.append(bin_target_file)
 
@@ -66,13 +74,10 @@ class Payne:
         # TODO roll back if it fails
 
     def uninstall(self, package_name: str, version: str):
-        apps_dir = Path.home() / ".local" / "share" / "payne" / "apps"  # TODO better
-        bin_dir = Path.home() / ".local" / "bin"
+        print(f"Apps directory: {self.apps_dir}")
+        print(f"Bin directory:  {self.bin_dir}")
 
-        print(f"Apps directory: {apps_dir}")
-        print(f"Bin directory:  {bin_dir}")
-
-        app_dir = apps_dir / package_name / version
+        app_dir = self.app_dir(package_name, version)
 
         print(f"Uninstall {package_name} {version}")
 
@@ -97,9 +102,7 @@ class Payne:
             subprocess.call(command, env=env)
 
     def list_(self):
-        apps_dir = Path.home() / ".local" / "share" / "payne" / "apps"  # TODO better
-
-        for app_dir in apps_dir.iterdir():
+        for app_dir in self.apps_dir.iterdir():
             app_name = app_dir.name
             for version_dir in app_dir.iterdir():
                 app_version = version_dir.name
