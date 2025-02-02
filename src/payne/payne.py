@@ -1,11 +1,12 @@
 from functools import cached_property
 import json
-import os
 from pathlib import Path
 import shutil
-import subprocess
 from tempfile import TemporaryDirectory
 import tomllib
+
+
+from payne import Uv, App
 
 
 class Payne:
@@ -20,9 +21,6 @@ class Payne:
     def bin_dir(self):
         return Path.home() / ".local" / "bin"
 
-    def app_dir(self, app_name: str, app_version: str):
-        return self.apps_dir / app_name / app_version
-
     def status(self):
         print(f"Apps directory: {self.apps_dir}")
         print(f"Bin directory:  {self.bin_dir}")
@@ -36,26 +34,16 @@ class Payne:
         project_name = pyproject["project"]["name"]
         project_version = pyproject["project"]["version"]
 
-        app_dir = self.app_dir(project_name, project_version)
+        app = App(self, project_name, project_version)
 
         print(f"Install {project_name} {project_version} from {source_path}")
 
         bin_files = []
 
         with TemporaryDirectory() as temp_dir:
-            uv = shutil.which("uv")
-            command = [
-                uv,
-                "tool",
-                "install",
-                "--from", source_path,
-                project_name,
-            ]
-            env = os.environ.copy()
-            env["UV_TOOL_DIR"] = str(app_dir)
-            env["UV_TOOL_BIN_DIR"] = str(temp_dir)
-            env["PATH"] = os.pathsep.join([env["PATH"], temp_dir])
-            subprocess.call(command, env=env)
+            temp_dir = Path(temp_dir)
+            uv = Uv(Path(shutil.which("uv")), tool_dir=app.app_dir, tool_bin_dir=temp_dir)
+            uv.tool_install_local(source_path, project_name, extra_path=[temp_dir])
 
             for bin_file in Path(temp_dir).iterdir():
                 bin_file: Path
@@ -69,35 +57,25 @@ class Payne:
             "bin_files": [str(bin_file) for bin_file in bin_files],
         }
 
-        metadata_file = app_dir / "payne_app.json"
-        metadata_file.write_text(json.dumps(metadata))
+        app.write_metadata(metadata)
 
         # TODO roll back if it fails
 
     def uninstall(self, package_name: str, version: str):
-        app_dir = self.app_dir(package_name, version)
+        app = App(self, package_name, version)
 
         print(f"Uninstall {package_name} {version}")
 
-        metadata_file = app_dir / "payne_app.json"
-        metadata = json.loads(metadata_file.read_text())
+        metadata = app.read_metadata()
         bin_files = [Path(bin_file) for bin_file in metadata["bin_files"]]
 
         for bin_file in bin_files:
             bin_file.unlink(missing_ok=True)
 
         with TemporaryDirectory() as temp_dir:
-            uv = shutil.which("uv")
-            command = [
-                uv,
-                "tool",
-                "uninstall",
-                package_name
-            ]
-            env = os.environ.copy()
-            env["UV_TOOL_DIR"] = str(app_dir)
-            env["UV_TOOL_BIN_DIR"] = str(temp_dir)
-            subprocess.call(command, env=env)
+            temp_dir = Path(temp_dir)
+            uv = Uv(Path(shutil.which("uv")), tool_dir=app.app_dir, tool_bin_dir=temp_dir)
+            uv.tool_uninstall(package_name)
 
     def list_(self):
         for app_dir in self.apps_dir.iterdir():
