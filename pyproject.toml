@@ -6,7 +6,7 @@ readme = "README.md"
 authors = [
     { name = "Martin Herrmann", email = "martin@famherrmann.de" }
 ]
-requires-python = ">=3.12"
+requires-python = ">=3.11"
 dependencies = [
     "cyclopts>=3.3.1",
 ]
