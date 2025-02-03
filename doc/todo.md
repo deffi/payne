@@ -61,6 +61,9 @@ Support packages from PyPI
   * Need to check `pyproject.toml` conditions after unpacking rather than before
     copying
 
+Install from local archive
+https://packaging.python.org/en/latest/guides/installing-using-pip-and-virtual-environments/
+
 Other sources?
   * Git
   * SVN
@@ -78,3 +81,5 @@ Allow requesting a coarser version. E.g., request version 1 and get 1.0.0.
   * Should we install into `foo-1` or `foo-1.0.0`?
 
 Handle conflicts between multiple packages that declare the same script
+
+Support installing with venv instead of uv
