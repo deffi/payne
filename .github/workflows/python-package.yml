@@ -1,6 +1,6 @@
 # Install dependencies and run tests on push and on pull request
 
-name: Python package
+name: Run tests
 
 on:
   push:
@@ -11,12 +11,12 @@ on:
 
 jobs:
   build:
-    runs-on: ubuntu-latest
-
     strategy:
       fail-fast: false
       matrix:
         python-version: ["3.11", "3.12", "3.13"]
+
+    runs-on: ubuntu-latest
 
     steps:
     - name: Check out the project
