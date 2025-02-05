@@ -35,6 +35,19 @@ class Uv:
             package,
         ], extra_path=extra_path)
 
+    def tool_install_remote(self, package: str, version: str, extra_path: list[Path] = None):
+        package_spec = f"{package}=={version}"
+
+        # Re-install in case it's already installed and we missed it. Should
+        # have raised an exception, but uv doesn't return an error code in this
+        # case.
+        self._run([
+            "tool",
+            "install",
+            "--reinstall",
+            package_spec,
+        ], extra_path=extra_path)
+
     def tool_uninstall(self, name: str, extra_path: list[Path] = None):
         self._run([
             "tool",

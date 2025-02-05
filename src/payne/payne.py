@@ -1,4 +1,5 @@
 from functools import cached_property
+from importlib.util import source_hash
 from pathlib import Path
 import shutil
 
@@ -37,9 +38,19 @@ class Payne:
             print(f"{app.name} {app.version} is already installed")
         else:
             print(f"Install {app.name} {app.version} from {source_path}")
-            app.install(source_path, self.bin_dir, self.uv_binary)
+            app.install_from_local(source_path, self.bin_dir, self.uv_binary)
 
         # TODO roll back if it fails (e.g., script already exists)
+
+    def install_from_remote(self, name: str, version: str):
+        app = App(self.apps_dir, name, version)
+
+        if app.is_installed():
+            # TODO duplication with install_from_local
+            print(f"{app.name} {app.version} is already installed")
+        else:
+            print(f"Install {app.name} {app.version}")
+            app.install_from_remote(self.bin_dir, self.uv_binary)
 
     def uninstall(self, package_name: str, version: str):
         app = App(self.apps_dir, package_name, version)

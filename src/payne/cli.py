@@ -14,9 +14,18 @@ def status():
 
 
 @app.command
-def install(*, from_: Path):
-    Payne().install_from_local(from_)
-
+def install(
+        name: str | None = None,
+        version: str | None = None,
+        /, *,
+        from_: Path | None = None):
+    match name, version, from_:
+        case n, v, None:
+            Payne().install_from_remote(name, version)
+        case None, None, from_:
+            Payne().install_from_local(from_)
+        case _:
+            print("Either name and version or --from have to be specified")
 
 @app.command
 def uninstall(package_name: str, version: str):

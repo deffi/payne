@@ -53,11 +53,22 @@ class App:
                 for version_dir in app_dir.iterdir():
                     yield cls(apps_dir, app_name, version_dir.name)
 
-    def install(self, source_path: Path, bin_dir: Path, uv_binary: Path):
+    def install_from_local(self, source_path: Path, bin_dir: Path, uv_binary: Path):
         with TemporaryDirectory() as temp_dir:
             temp_dir = Path(temp_dir)
             uv = Uv(uv_binary, tool_dir=self.app_dir, tool_bin_dir=temp_dir)
             uv.tool_install_local(source_path, self.name, extra_path=[temp_dir])
+            scripts = self._install_scripts(temp_dir, bin_dir)
+
+            metadata = AppMetadata()
+            metadata.scripts.extend(scripts)
+            self.write_metadata(metadata)
+
+    def install_from_remote(self, bin_dir: Path, uv_binary: Path):
+        with TemporaryDirectory() as temp_dir:
+            temp_dir = Path(temp_dir)
+            uv = Uv(uv_binary, tool_dir=self.app_dir, tool_bin_dir=temp_dir)
+            uv.tool_install_remote(self.name, self.version, extra_path=[temp_dir])
             scripts = self._install_scripts(temp_dir, bin_dir)
 
             metadata = AppMetadata()
