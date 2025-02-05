@@ -4,18 +4,14 @@ import json
 from pathlib import Path
 import shutil
 from tempfile import TemporaryDirectory
-from typing import TYPE_CHECKING, Self
+from typing import Self
 
 from payne import AppMetadata, Uv
 
-if TYPE_CHECKING:
-    from payne import Payne
-
 
 class App:
-    # TODO remove the reference to Payne, store apps_dir instead
-    def __init__(self, payne: "Payne", name: str, version: str):
-        self._payne = payne
+    def __init__(self, apps_dir, name: str, version: str):
+        self._apps_dir = apps_dir
         self._name = name
         self._version = version
 
@@ -29,7 +25,7 @@ class App:
 
     @cached_property
     def app_dir(self) -> Path:
-        return self._payne.apps_dir / self._name / self._version
+        return self._apps_dir / self._name / self._version
 
     # Scripts ##################################################################
 
@@ -50,14 +46,12 @@ class App:
         return self.app_dir.exists()
 
     @classmethod
-    def installed_apps(cls, payne: "Payne") -> Iterator[Self]:
-        apps_dir = payne.apps_dir
-
+    def installed_apps(cls, apps_dir: Path) -> Iterator[Self]:
         if apps_dir.exists():
             for app_dir in apps_dir.iterdir():
                 app_name = app_dir.name
                 for version_dir in app_dir.iterdir():
-                    yield cls(payne, app_name, version_dir.name)
+                    yield cls(apps_dir, app_name, version_dir.name)
 
     def install(self, source_path: Path, bin_dir: Path, uv_binary: Path):
         with TemporaryDirectory() as temp_dir:

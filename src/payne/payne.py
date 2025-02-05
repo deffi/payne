@@ -3,7 +3,7 @@ from pathlib import Path
 import shutil
 
 
-from payne import Uv, App, Pyproject
+from payne import App, Pyproject
 
 
 class Payne:
@@ -28,7 +28,7 @@ class Payne:
 
     def install_from_local(self, source_path: Path):
         pyproject = Pyproject.load(source_path / "pyproject.toml")
-        app = App(self, pyproject.name(), pyproject.version())
+        app = App(self.apps_dir, pyproject.name(), pyproject.version())
 
         if app.is_installed():
             # TODO allow reinstall
@@ -42,7 +42,7 @@ class Payne:
         # TODO roll back if it fails (e.g., script already exists)
 
     def uninstall(self, package_name: str, version: str):
-        app = App(self, package_name, version)
+        app = App(self.apps_dir, package_name, version)
 
         if app.is_installed():
             print(f"Uninstall {package_name} {version}")
@@ -51,7 +51,7 @@ class Payne:
             print(f"{package_name} {version} is not installed")
 
     def list_(self):
-        for app in App.installed_apps(self):
+        for app in App.installed_apps(self.apps_dir):
             print(f"{app.name} {app.version}")
             app_metadata = app.read_metadata()
 
