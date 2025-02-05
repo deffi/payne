@@ -72,8 +72,6 @@ Other sources?
 Support other package mangers
   * https://pypi.org/project/migrate-to-uv/
 
-Add `payne uninstall`
-
 Allow requesting a coarser version. E.g., request version 1 and get 1.0.0.
   * Should we then also provide a `foo-1` (and potentially `foo-1.0`) command in
     addition to `foo-1.0.0`? Should we even do that unconditionally, provided
