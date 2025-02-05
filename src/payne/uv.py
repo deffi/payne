@@ -1,5 +1,6 @@
 import os
 from pathlib import Path
+import shlex
 import subprocess
 
 
@@ -19,12 +20,16 @@ class Uv:
 
         call_args = [self._binary, *uv_args]
 
-        return subprocess.call(call_args, env=env)
+        return subprocess.check_call(call_args, env=env)
 
     def tool_install_local(self, path: Path, package: str, extra_path: list[Path] = None):
+        # Re-install in case it's already installed and we missed it. Should
+        # have raised an exception, but uv doesn't return an error code in this
+        # case.
         self._run([
             "tool",
             "install",
+            "--reinstall",
             "--from", path,
             package,
         ], extra_path=extra_path)
