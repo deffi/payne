@@ -1,11 +1,8 @@
 from collections.abc import Iterator
 from functools import cached_property
-import json
-from importlib.metadata import metadata
 from pathlib import Path
 import shutil
 from tempfile import TemporaryDirectory
-import tomllib
 
 
 from payne import Uv, App, Pyproject, AppMetadata
