@@ -34,6 +34,7 @@ class Payne:
     def install_scripts(self, app: App, source_dir: Path) -> Iterator[Path]:
         for source_script in source_dir.iterdir():
             script = self.bin_dir / app.script_file_name(source_script)
+            print(f"Installing script {source_script.name} to {script}")
             shutil.move(source_script, script)
             yield script
 
@@ -63,6 +64,7 @@ class Payne:
         app_metadata = app.read_metadata()
 
         for script in app_metadata.scripts:
+            print(f"Uninstall script {script}")
             script.unlink(missing_ok=True)
 
         # Use a temporary tool bin dir for uv so it doesn't uninstall scripts

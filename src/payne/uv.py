@@ -20,6 +20,7 @@ class Uv:
 
         call_args = [self._binary, *uv_args]
 
+        print(f"Calling uv: {shlex.join(map(str, call_args))}")
         return subprocess.check_call(call_args, env=env)
 
     def tool_install_local(self, path: Path, package: str, extra_path: list[Path] = None):
