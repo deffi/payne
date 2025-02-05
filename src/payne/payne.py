@@ -73,13 +73,14 @@ class Payne:
             uv.tool_uninstall(package_name)
 
     def list_(self):
-        for app_dir in self.apps_dir.iterdir():
-            app_name = app_dir.name
-            for version_dir in app_dir.iterdir():
-                app = App(self, app_name, version_dir.name)
+        if self.apps_dir.exists():
+            for app_dir in self.apps_dir.iterdir():
+                app_name = app_dir.name
+                for version_dir in app_dir.iterdir():
+                    app = App(self, app_name, version_dir.name)
 
-                print(f"{app.name} {app.version}")
-                app_metadata = app.read_metadata()
+                    print(f"{app.name} {app.version}")
+                    app_metadata = app.read_metadata()
 
-                for script in app_metadata.scripts:
-                    print(f"  - {script.name}")
+                    for script in app_metadata.scripts:
+                        print(f"  - {script.name}")
