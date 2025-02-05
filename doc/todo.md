@@ -11,7 +11,7 @@ Identify paths:
 
 Test data with dependencies
 
-When installing von pacakge index:
+When installing from package index:
   * Fetch sdist to temporary directory
 
 Generate temporary `requirements.txt` with  locked dependency version
