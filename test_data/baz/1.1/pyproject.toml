@@ -1,11 +1,11 @@
 [project]
-name = "foo"
-version = "1.0"
+name = "baz"
+version = "1.1"
 requires-python = ">=3.12"
 dependencies = []
 
 [project.scripts]
-foo = "foo:main"
+baz = "baz:main"
 
 [build-system]
 requires = ["hatchling"]
