@@ -10,6 +10,18 @@ Identify paths:
 ## Locked dependencies
 
 Test data with dependencies
+  * baz
+    * 2.1.0
+    * 2.1.1
+  * lib -> baz
+    * All locked baz@2.1.0 -> locked   install bar 2.2.x, baz 2.1.0
+    * 2.2.0 -> bar*        -> unlocked install bar 2.2.0, baz 2.1.1
+    * 2.2.1 -> bar*        -> unlocked install bar 2.2.1, baz 2.1.1
+  * foo -> bar (-> baz)
+    * All locked bar@2.2.0, baz@2.1.0 -> locked   install foo 2.3.x, bar 2.2.0, baz 2.1.0
+    * 2.3.0 -> bar*                   -> unlocked install foo 2.3.0, bar 2.2.1, baz 2.1.1
+    * 2.3.1 -> bar==2.2.0             -> unlocked install foo 2.3.1, bar 2.2.0, baz 2.1.1
+    * 2.3.2 -> bar==2.2.0, baz=2.1.0  -> unlocked install foo 2.3.2, bar 2.2.0, baz 2.1.0
 
 When installing from package index:
   * Fetch sdist to temporary directory
@@ -84,3 +96,5 @@ Allow requesting a coarser version. E.g., request version 1 and get 1.0.0.
 Handle conflicts between multiple packages that declare the same script
 
 Support installing with venv instead of uv
+
+Ensure that even if a library has a lockfile, only tha app lockfile is used.
