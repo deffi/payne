@@ -9,19 +9,19 @@ Identify paths:
 
 ## Locked dependencies
 
-Test data with dependencies
+Test plan
   * baz
-    * 2.1.0
-    * 2.1.1
-  * lib -> baz
-    * All locked baz@2.1.0 -> locked   install bar 2.2.x, baz 2.1.0
-    * 2.2.0 -> bar*        -> unlocked install bar 2.2.0, baz 2.1.1
-    * 2.2.1 -> bar*        -> unlocked install bar 2.2.1, baz 2.1.1
+    * 1.1.0
+    * 1.1.1
+  * bar -> baz
+    * All locked baz@1.1.0 -> locked   install bar 1.2.x, baz 1.1.0
+    * 1.2.0 -> bar*        -> unlocked install bar 1.2.0, baz 1.1.1
+    * 1.2.1 -> bar*        -> unlocked install bar 1.2.1, baz 1.1.1
   * foo -> bar (-> baz)
-    * All locked bar@2.2.0, baz@2.1.0 -> locked   install foo 2.3.x, bar 2.2.0, baz 2.1.0
-    * 2.3.0 -> bar*                   -> unlocked install foo 2.3.0, bar 2.2.1, baz 2.1.1
-    * 2.3.1 -> bar==2.2.0             -> unlocked install foo 2.3.1, bar 2.2.0, baz 2.1.1
-    * 2.3.2 -> bar==2.2.0, baz=2.1.0  -> unlocked install foo 2.3.2, bar 2.2.0, baz 2.1.0
+    * All locked bar@1.2.0, baz@1.1.0 -> locked   install foo 1.3.x, bar 1.2.0, baz 1.1.0
+    * 1.3.0 -> bar*                   -> unlocked install foo 1.3.0, bar 1.2.1, baz 1.1.1
+    * 1.3.1 -> bar==1.2.0             -> unlocked install foo 1.3.1, bar 1.2.0, baz 1.1.1
+    * 1.3.2 -> bar==1.2.0, baz=1.1.0  -> unlocked install foo 1.3.2, bar 1.2.0, baz 1.1.0
 
 When installing from package index:
   * Fetch sdist to temporary directory
