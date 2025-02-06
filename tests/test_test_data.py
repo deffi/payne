@@ -45,15 +45,20 @@ class TestTestData:
             )
 
             # Run the command in the project
-            output = subprocess.check_output(
-                ["uv", "run", script],  # TODO ensure no changes to uv.lock?
-                cwd=project,
-                env=env,
-                stderr=subprocess.STDOUT,
-                encoding="utf-8",
-                universal_newlines=True,
-            )
-            assert output == expected
+            try:
+                output = subprocess.check_output(
+                    ["uv", "run", script],  # TODO ensure no changes to uv.lock?
+                    cwd=project,
+                    env=env,
+                    stderr=subprocess.STDOUT,
+                    encoding="utf-8",
+                    universal_newlines=True,
+                )
+                assert output == expected
+            except subprocess.CalledProcessError as e:
+                print(e.stdout)
+                print(e.stderr)
+                assert False
 
     # Since we're installing the project as a uv tool, the lockfile will not be
     # honored and all dependencies will be at the latest version, unless pinned
@@ -80,12 +85,17 @@ class TestTestData:
             env["UV_INDEX"] = "payne_test_data=http://localhost:8000/payne_test_data"
 
             # Run the command as a tool
-            output = subprocess.check_output(
-                ["uv", "tool", "run", "--from", project, script],
-                cwd=project,
-                env=env,
-                stderr=subprocess.STDOUT,
-                encoding="utf-8",
-                universal_newlines=True,
-            )
-            assert output == expected
+            try:
+                output = subprocess.check_output(
+                    ["uv", "tool", "run", "--from", project, script],
+                    cwd=project,
+                    env=env,
+                    stderr=subprocess.STDOUT,
+                    encoding="utf-8",
+                    universal_newlines=True,
+                )
+                assert output == expected
+            except subprocess.CalledProcessError as e:
+                print(e.stdout)
+                print(e.stderr)
+                assert False
