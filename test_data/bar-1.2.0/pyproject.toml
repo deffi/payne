@@ -2,7 +2,9 @@
 name = "bar"
 version = "1.2.0"
 requires-python = ">=3.12"
-dependencies = []
+dependencies = [
+    "baz",
+]
 
 [project.scripts]
 bar = "bar:hello_bar"
@@ -10,3 +12,6 @@ bar = "bar:hello_bar"
 [build-system]
 requires = ["hatchling"]
 build-backend = "hatchling.build"
+
+[tool.uv.sources]
+baz = { index = "payne_test_data" }

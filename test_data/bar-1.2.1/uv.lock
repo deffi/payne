@@ -5,3 +5,18 @@ requires-python = ">=3.12"
 name = "bar"
 version = "1.2.1"
 source = { editable = "." }
+dependencies = [
+    { name = "baz" },
+]
+
+[package.metadata]
+requires-dist = [{ name = "baz", index = "http://localhost:8000/payne_test_data" }]
+
+[[package]]
+name = "baz"
+version = "1.1.0"
+source = { registry = "http://localhost:8000/payne_test_data" }
+sdist = { url = "http://localhost:8000/payne_test_data/baz/baz-1.1.0.tar.gz" }
+wheels = [
+    { url = "http://localhost:8000/payne_test_data/baz/baz-1.1.0-py3-none-any.whl" },
+]

@@ -9,6 +9,8 @@ Identify paths:
 
 ## Locked dependencies
 
+set -x UV_INDEX payne_test_data=http://localhost:8000/payne_test_data
+
 Test plan
   * baz
     * 1.1.0
