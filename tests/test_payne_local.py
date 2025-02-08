@@ -26,7 +26,14 @@ class TestPayneLocal:
 
     @staticmethod
     def installed_scripts(bin_dir: Path):
-        return child_names(bin_dir)
+        script_files = child_names(bin_dir)
+
+        # On Windows, all script names must end with .exe and we remove that
+        if os.name == "nt":
+            assert all(script_file.endswith(".exe") for script_file in script_files)
+            script_files = [script_file[:-4] for script_file in script_files]
+
+        return script_files
 
     def test_install_from_local_uninstall(self):
         with TemporaryDirectory() as temp_dir:
@@ -41,41 +48,42 @@ class TestPayneLocal:
             # Install foo 1.3.0
             payne.install_from_local(test_data / "foo-1.3.0")
             assert self.installed_apps(apps_dir) == {"foo": ["1.3.0"]}
-            assert self.installed_scripts(bin_dir) == ["foo-1.3.0.exe"]  # TODO Windows specific (all instances)
+            assert self.installed_scripts(bin_dir) == ["foo-1.3.0"]
             self.assert_app_valid(apps_dir, "foo", "1.3.0")
 
             # Install foo 1.3.1
             payne.install_from_local(test_data / "foo-1.3.1")
             assert self.installed_apps(apps_dir) == {"foo": ["1.3.0", "1.3.1"]}
-            assert self.installed_scripts(bin_dir) == ["foo-1.3.0.exe", "foo-1.3.1.exe"]
+            assert self.installed_scripts(bin_dir) == ["foo-1.3.0", "foo-1.3.1"]
             self.assert_app_valid(apps_dir, "foo", "1.3.0")
             self.assert_app_valid(apps_dir, "foo", "1.3.1")
 
             # Install foo 1.3.2
             payne.install_from_local(test_data / "foo-1.3.2")
             assert self.installed_apps(apps_dir) == {"foo": ["1.3.0", "1.3.1", "1.3.2"]}
-            assert self.installed_scripts(bin_dir) == ["foo-1.3.0.exe", "foo-1.3.1.exe", "foo-1.3.2.exe"]
+            assert self.installed_scripts(bin_dir) == ["foo-1.3.0", "foo-1.3.1", "foo-1.3.2"]
             self.assert_app_valid(apps_dir, "foo", "1.3.0")
             self.assert_app_valid(apps_dir, "foo", "1.3.1")
             self.assert_app_valid(apps_dir, "foo", "1.3.2")
 
             # Run the scripts
-            assert process_output([bin_dir / "foo-1.3.0.exe"]) == (
+            # Windows will automatically use the .exe
+            assert process_output([bin_dir / "foo-1.3.0"]) == (
                 "This is foo 1.3.0\nThis is bar 1.2.1\nThis is baz 1.1.1\n", "")
-            assert process_output([bin_dir / "foo-1.3.1.exe"]) == (
+            assert process_output([bin_dir / "foo-1.3.1"]) == (
                 "This is foo 1.3.1\nThis is bar 1.2.0\nThis is baz 1.1.1\n", "")
 
             # Uninstall foo 1.3.0
             payne.uninstall("foo", "1.3.0")
             assert self.installed_apps(apps_dir) == {"foo": ["1.3.1", "1.3.2"]}
-            assert self.installed_scripts(bin_dir) == ["foo-1.3.1.exe", "foo-1.3.2.exe"]
+            assert self.installed_scripts(bin_dir) == ["foo-1.3.1", "foo-1.3.2"]
             self.assert_app_valid(apps_dir, "foo", "1.3.1")
             self.assert_app_valid(apps_dir, "foo", "1.3.2")
 
             # Uninstall foo 1.3.1
             payne.uninstall("foo", "1.3.1")
             assert self.installed_apps(apps_dir) == {"foo": ["1.3.2"]}
-            assert self.installed_scripts(bin_dir) == ["foo-1.3.2.exe"]
+            assert self.installed_scripts(bin_dir) == ["foo-1.3.2"]
             self.assert_app_valid(apps_dir, "foo", "1.3.2")
 
             # Uninstall foo 1.3.2
