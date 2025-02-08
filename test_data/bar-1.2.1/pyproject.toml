@@ -15,3 +15,8 @@ build-backend = "hatchling.build"
 
 [tool.uv.sources]
 baz = { index = "payne_test_data" }
+
+[tool.hatch.build.targets.sdist]
+exclude = [
+  ".venv*",
+]
