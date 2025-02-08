@@ -100,3 +100,8 @@ Handle conflicts between multiple packages that declare the same script
 Support installing with venv instead of uv
 
 Ensure that even if a library has a lockfile, only tha app lockfile is used.
+
+
+# Documentation
+
+Details on test data

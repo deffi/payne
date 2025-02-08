@@ -8,6 +8,11 @@ earlier version, you may have to delete your applications directory and
 re-install applications.
 
 
+## Testing
+
+Before running the tests, run `scripts/build-test-data.py`
+
+
 ## Etymology
 
 This should have been called "Pain", for **P**ython **a**pplication
