@@ -5,6 +5,7 @@ from tempfile import TemporaryDirectory
 import pytest
 
 import payne
+
 # Need this to be in scope so it can be autoused
 # noinspection PyUnresolvedReferences
 from fixtures.index_server import index_server

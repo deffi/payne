@@ -34,6 +34,8 @@ class App:
         return original.with_stem(stem_with_version).name
 
     def _install_scripts(self, source_dir: Path, bin_dir: Path) -> Iterator[Path]:
+        bin_dir.mkdir(parents=True, exist_ok=True)
+
         for source_script in source_dir.iterdir():
             script = bin_dir / self._script_file_name(source_script)
             print(f"Installing script {source_script.name} to {script}")
