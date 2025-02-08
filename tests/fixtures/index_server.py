@@ -1,4 +1,5 @@
 import http.server
+import socket
 from threading import Thread
 
 import pytest
@@ -23,6 +24,8 @@ class Handler(http.server.SimpleHTTPRequestHandler):
 
 
 def _run_server():
+    # For some reason, this makes the server way more fasterer on Windows
+    http.server.ThreadingHTTPServer.address_family = socket.AddressFamily.AF_INET6
     server = http.server.ThreadingHTTPServer(('', 8000), Handler)
     server.serve_forever()
 
