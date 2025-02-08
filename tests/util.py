@@ -2,8 +2,8 @@ from pathlib import Path
 import subprocess
 
 
-def child_names(directory: Path) -> list[str]:
-    return [child.name for child in directory.iterdir()]
+def child_names(directory: Path) -> set[str]:
+    return {child.name for child in directory.iterdir()}
 
 
 def process_output(args: list) -> tuple[str, str]:

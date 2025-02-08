@@ -20,18 +20,18 @@ class TestPayneLocal:
         assert (apps_dir / name / version / name / "pyvenv.cfg").is_file()  # venv metadata
 
     @staticmethod
-    def installed_apps(app_dir: Path):
+    def installed_apps(app_dir: Path) -> dict[str, set[str]]:
         return {name: child_names(app_dir / name)
                 for name in child_names(app_dir)}
 
     @staticmethod
-    def installed_scripts(bin_dir: Path):
+    def installed_scripts(bin_dir: Path) -> set[str]:
         script_files = child_names(bin_dir)
 
         # On Windows, all script names must end with .exe and we remove that
         if os.name == "nt":
             assert all(script_file.endswith(".exe") for script_file in script_files)
-            script_files = [script_file[:-4] for script_file in script_files]
+            script_files = {script_file[:-4] for script_file in script_files}
 
         return script_files
 
@@ -47,21 +47,21 @@ class TestPayneLocal:
 
             # Install foo 1.3.0
             payne.install_from_local(test_data / "foo-1.3.0")
-            assert self.installed_apps(apps_dir) == {"foo": ["1.3.0"]}
-            assert self.installed_scripts(bin_dir) == ["foo-1.3.0"]
+            assert self.installed_apps(apps_dir) == {"foo": {"1.3.0"}}
+            assert self.installed_scripts(bin_dir) == {"foo-1.3.0"}
             self.assert_app_valid(apps_dir, "foo", "1.3.0")
 
             # Install foo 1.3.1
             payne.install_from_local(test_data / "foo-1.3.1")
-            assert self.installed_apps(apps_dir) == {"foo": ["1.3.0", "1.3.1"]}
-            assert self.installed_scripts(bin_dir) == ["foo-1.3.0", "foo-1.3.1"]
+            assert self.installed_apps(apps_dir) == {"foo": {"1.3.0", "1.3.1"}}
+            assert self.installed_scripts(bin_dir) == {"foo-1.3.0", "foo-1.3.1"}
             self.assert_app_valid(apps_dir, "foo", "1.3.0")
             self.assert_app_valid(apps_dir, "foo", "1.3.1")
 
             # Install foo 1.3.2
             payne.install_from_local(test_data / "foo-1.3.2")
-            assert self.installed_apps(apps_dir) == {"foo": ["1.3.0", "1.3.1", "1.3.2"]}
-            assert self.installed_scripts(bin_dir) == ["foo-1.3.0", "foo-1.3.1", "foo-1.3.2"]
+            assert self.installed_apps(apps_dir) == {"foo": {"1.3.0", "1.3.1", "1.3.2"}}
+            assert self.installed_scripts(bin_dir) == {"foo-1.3.0", "foo-1.3.1", "foo-1.3.2"}
             self.assert_app_valid(apps_dir, "foo", "1.3.0")
             self.assert_app_valid(apps_dir, "foo", "1.3.1")
             self.assert_app_valid(apps_dir, "foo", "1.3.2")
@@ -75,18 +75,18 @@ class TestPayneLocal:
 
             # Uninstall foo 1.3.0
             payne.uninstall("foo", "1.3.0")
-            assert self.installed_apps(apps_dir) == {"foo": ["1.3.1", "1.3.2"]}
-            assert self.installed_scripts(bin_dir) == ["foo-1.3.1", "foo-1.3.2"]
+            assert self.installed_apps(apps_dir) == {"foo": {"1.3.1", "1.3.2"}}
+            assert self.installed_scripts(bin_dir) == {"foo-1.3.1", "foo-1.3.2"}
             self.assert_app_valid(apps_dir, "foo", "1.3.1")
             self.assert_app_valid(apps_dir, "foo", "1.3.2")
 
             # Uninstall foo 1.3.1
             payne.uninstall("foo", "1.3.1")
-            assert self.installed_apps(apps_dir) == {"foo": ["1.3.2"]}
-            assert self.installed_scripts(bin_dir) == ["foo-1.3.2"]
+            assert self.installed_apps(apps_dir) == {"foo": {"1.3.2"}}
+            assert self.installed_scripts(bin_dir) == {"foo-1.3.2"}
             self.assert_app_valid(apps_dir, "foo", "1.3.2")
 
             # Uninstall foo 1.3.2
             payne.uninstall("foo", "1.3.2")
             assert self.installed_apps(apps_dir) == {}
-            assert self.installed_scripts(bin_dir) == []
+            assert self.installed_scripts(bin_dir) == set()
