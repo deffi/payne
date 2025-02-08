@@ -1,13 +1,9 @@
 import http.server
-from pathlib import Path
 from threading import Thread
 
 import pytest
 
-import payne
-
-
-run = Path(payne.__file__).parent.parent.parent / "run"
+from dirs import run
 
 
 class Handler(http.server.SimpleHTTPRequestHandler):

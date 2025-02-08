@@ -1,5 +1,4 @@
 import os
-from pathlib import Path
 import subprocess
 from tempfile import TemporaryDirectory
 
@@ -9,8 +8,7 @@ import payne
 # Need this to be in scope so it can be autoused
 # noinspection PyUnresolvedReferences
 from fixtures.index_server import index_server
-
-test_data = Path(payne.__file__).parent.parent.parent / "test_data"
+from dirs import test_data
 
 
 class TestTestData:
