@@ -36,6 +36,9 @@ class TestTestData:
             env["UV_INDEX"] = "payne_test_data=http://localhost:8000/payne_test_data"
 
             # Create the project environment and install the project
+            # We do this as a separate step so we don't get extra output from
+            # the invocation of the script
+            # TODO in case of error, show stdout and stderr
             subprocess.check_call(
                 ["uv", "sync"],  # TODO ensure no changes to uv.lock?
                 cwd=project,
@@ -85,12 +88,13 @@ class TestTestData:
             env["UV_INDEX"] = "payne_test_data=http://localhost:8000/payne_test_data"
 
             # Run the command as a tool
+            # Uv may output messages on stderr.
             try:
                 output = subprocess.check_output(
                     ["uv", "tool", "run", "--from", project, script],
                     cwd=project,
                     env=env,
-                    stderr=subprocess.STDOUT,
+                    stderr=subprocess.PIPE,
                     encoding="utf-8",
                     universal_newlines=True,
                 )
