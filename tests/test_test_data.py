@@ -6,6 +6,9 @@ from tempfile import TemporaryDirectory
 import pytest
 
 import payne
+# Need this to be in scope so it can be autoused
+# noinspection PyUnresolvedReferences
+from fixtures.index_server import index_server
 
 test_data = Path(payne.__file__).parent.parent.parent / "test_data"
 
