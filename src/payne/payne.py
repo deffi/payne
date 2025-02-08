@@ -1,5 +1,4 @@
 from functools import cached_property
-from importlib.util import source_hash
 from pathlib import Path
 import shutil
 
@@ -8,16 +7,22 @@ from payne import App, Pyproject
 
 
 class Payne:
-    def __init__(self):
-        ...
+    # TODO get rid of defaults
+    def __init__(
+            self,
+            apps_dir: Path = Path.home() / ".local" / "share" / "payne" / "apps",  # TODO better
+            bin_dir: Path = Path.home() / ".local" / "bin",  # TODO better
+            ):
+        self._apps_dir = apps_dir
+        self._bin_dir = bin_dir
 
     @cached_property
     def apps_dir(self):
-        return Path.home() / ".local" / "share" / "payne" / "apps"  # TODO better
+        return self._apps_dir
 
     @cached_property
     def bin_dir(self):
-        return Path.home() / ".local" / "bin"
+        return self._bin_dir
 
     @cached_property
     def uv_binary(self) -> Path:
