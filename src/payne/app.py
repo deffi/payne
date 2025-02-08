@@ -94,7 +94,7 @@ class App:
             uv.tool_uninstall(self.name)
 
         # TODO remove app dir if it still exists, and output a warning if it
-        #  isn't empty
+        # isn't empty
 
     # Metadata #################################################################
 
