@@ -38,26 +38,36 @@ class TestTestData:
             # Create the project environment and install the project
             # We do this as a separate step so we don't get extra output from
             # the invocation of the script
-            # TODO in case of error, show stdout and stderr
-            subprocess.check_call(
-                ["uv", "sync"],  # TODO ensure no changes to uv.lock?
-                cwd=project,
-                env=env,
-                stdout=subprocess.DEVNULL,
-                stderr=subprocess.DEVNULL,
-            )
+            try:
+                subprocess.run(
+                    ["uv", "sync"],  # TODO ensure no changes to uv.lock?
+                    cwd=project,
+                    env=env,
+                    stdout=subprocess.PIPE,
+                    stderr=subprocess.PIPE,
+                    encoding="utf-8",
+                    universal_newlines=True,
+                    check=True,
+                )
+            except subprocess.CalledProcessError as e:
+                print(e.stdout)
+                print(e.stderr)
+                assert False
 
             # Run the command in the project
             try:
-                output = subprocess.check_output(
+                result = subprocess.run(
                     ["uv", "run", script],  # TODO ensure no changes to uv.lock?
                     cwd=project,
                     env=env,
-                    stderr=subprocess.STDOUT,
+                    stdout=subprocess.PIPE,
+                    stderr=subprocess.PIPE,
                     encoding="utf-8",
                     universal_newlines=True,
+                    check=True,
                 )
-                assert output == expected
+                assert result.stdout == expected
+                assert result.stderr == ""
             except subprocess.CalledProcessError as e:
                 print(e.stdout)
                 print(e.stderr)
