@@ -102,6 +102,12 @@ Support installing with venv instead of uv
 Ensure that even if a library has a lockfile, only tha app lockfile is used.
 
 
+# Tests
+
+Re-install an app
+Uninstall a non-installed app
+
+
 # Documentation
 
 Details on test data
