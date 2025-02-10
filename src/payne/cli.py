@@ -18,12 +18,14 @@ def install(
         name: str | None = None,
         version: str | None = None,
         /, *,
-        from_: Path | None = None):
+        from_: Path | None = None,
+        locked: bool = True):
     match name, version, from_:
         case n, v, None:
+            assert NotImplementedError("Locked install of remote packages isn't implemented")
             Payne().install_from_remote(name, version)
         case None, None, from_:
-            Payne().install_from_local(from_)
+            Payne().install_from_local(from_, locked)
         case _:
             print("Either name and version or --from have to be specified")
 

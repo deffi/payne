@@ -80,6 +80,7 @@ class TestPayneLocal:
 
             # Run the scripts
             # Windows will automatically use the .exe
+            # TODO factor out expected output
             assert process_output([bin_dir / "foo-1.3.0"]) == (
                 "This is foo 1.3.0\nThis is bar 1.2.1\nThis is baz 1.1.1\n", "")
             assert process_output([bin_dir / "foo-1.3.1"]) == (
@@ -104,3 +105,55 @@ class TestPayneLocal:
             payne.uninstall("foo", "1.3.2")
             assert self.installed_apps(apps_dir) == {}
             assert self.installed_scripts(bin_dir) == set()
+
+    @pytest.mark.parametrize("source", ["local"])
+    def test_install_locked(self, source):
+        with TemporaryDirectory() as temp_dir:
+            # TODO duplication
+            def install_app(name: str, version: str):
+                match source:
+                    case "local":
+                        payne.install_from_local(test_data / f"{name}-{version}", locked=True)
+                    case "remote":
+                        payne.install_from_remote(name, version)
+                    case _:
+                        assert False
+
+            temp_dir = Path(temp_dir)
+            apps_dir = temp_dir / "apps"
+            bin_dir = temp_dir / "bin"
+
+            payne = Payne(apps_dir, bin_dir)
+            # TODO this variable should be independent of uv, TODO duplication
+            os.environ["UV_INDEX"] = "payne_test_data=http://localhost:8000/payne_test_data"
+
+            # Install foo 1.3.0
+            install_app("foo", "1.3.0")
+            assert self.installed_apps(apps_dir) == {"foo": {"1.3.0"}}
+            assert self.installed_scripts(bin_dir) == {"foo-1.3.0"}
+            self.assert_app_valid(apps_dir, "foo", "1.3.0")
+
+            # # Install foo 1.3.1
+            # install_app("foo", "1.3.1")
+            # assert self.installed_apps(apps_dir) == {"foo": {"1.3.0", "1.3.1"}}
+            # assert self.installed_scripts(bin_dir) == {"foo-1.3.0", "foo-1.3.1"}
+            # self.assert_app_valid(apps_dir, "foo", "1.3.0")
+            # self.assert_app_valid(apps_dir, "foo", "1.3.1")
+            #
+            # # Install foo 1.3.2
+            # install_app("foo", "1.3.2")
+            # assert self.installed_apps(apps_dir) == {"foo": {"1.3.0", "1.3.1", "1.3.2"}}
+            # assert self.installed_scripts(bin_dir) == {"foo-1.3.0", "foo-1.3.1", "foo-1.3.2"}
+            # self.assert_app_valid(apps_dir, "foo", "1.3.0")
+            # self.assert_app_valid(apps_dir, "foo", "1.3.1")
+            # self.assert_app_valid(apps_dir, "foo", "1.3.2")
+
+            # Run the scripts
+            # Windows will automatically use the .exe
+            # Locked means that all versions use bar 1.2.0 and baz 1.1.0
+            assert process_output([bin_dir / "foo-1.3.0"]) == (
+                "This is foo 1.3.0\nThis is bar 1.2.0\nThis is baz 1.1.0\n", "")
+            # assert process_output([bin_dir / "foo-1.3.1"]) == (
+            #     "This is foo 1.3.1\nThis is bar 1.2.0\nThis is baz 1.1.0\n", "")
+            # assert process_output([bin_dir / "foo-1.3.2"]) == (
+            #     "This is foo 1.3.2\nThis is bar 1.2.0\nThis is baz 1.1.0\n", "")

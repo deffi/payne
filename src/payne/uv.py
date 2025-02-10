@@ -23,15 +23,21 @@ class Uv:
         print(f"Calling uv: {shlex.join(map(str, call_args))}")
         return subprocess.check_call(call_args, env=env)
 
-    def tool_install_local(self, path: Path, package: str, extra_path: list[Path] = None):
+    def tool_install_local(self, path: Path, package: str, extra_path: list[Path] = None, requirements: Path|None = None):  # TODO remove default
         # Re-install in case it's already installed and we missed it. Should
         # have raised an exception, but uv doesn't return an error code in this
         # case.
+        if requirements:
+            constraints = ["--constraints", requirements]
+        else:
+            constraints = []
+
         self._run([
             "tool",
             "install",
             "--reinstall",
             "--from", path,
+            *constraints,
             package,
         ], extra_path=extra_path)
 
@@ -54,3 +60,15 @@ class Uv:
             "uninstall",
             name,
         ], extra_path=extra_path)
+
+    def export(self, project_path: Path, output_file: Path):
+        return self._run([
+            "export",
+            "--project", project_path,
+            "--no-dev",
+            "--no-emit-project",
+            "--frozen",
+            "--no-header",
+            "--no-hashes",
+            "--output-file", output_file,
+        ])

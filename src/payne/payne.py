@@ -32,7 +32,7 @@ class Payne:
         print(f"Apps directory: {self.apps_dir}")
         print(f"Bin directory:  {self.bin_dir}")
 
-    def install_from_local(self, source_path: Path):
+    def install_from_local(self, source_path: Path, locked: bool = False):  # TODO remove default
         pyproject = Pyproject.load(source_path / "pyproject.toml")
         app = App(self.apps_dir, pyproject.name(), pyproject.version())
 
@@ -43,7 +43,7 @@ class Payne:
             print(f"{app.name} {app.version} is already installed")
         else:
             print(f"Install {app.name} {app.version} from {source_path}")
-            app.install_from_local(source_path, self.bin_dir, self.uv_binary)
+            app.install_from_local(source_path, self.bin_dir, self.uv_binary, locked)
 
         # TODO roll back if it fails (e.g., script already exists)
 

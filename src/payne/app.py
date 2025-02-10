@@ -55,12 +55,21 @@ class App:
                 for version_dir in app_dir.iterdir():
                     yield cls(apps_dir, app_name, version_dir.name)
 
-    def install_from_local(self, source_path: Path, bin_dir: Path, uv_binary: Path):
+    def install_from_local(self, source_path: Path, bin_dir: Path, uv_binary: Path, locked: bool):
         with TemporaryDirectory() as temp_dir:
             temp_dir = Path(temp_dir)
-            uv = Uv(uv_binary, tool_dir=self.app_dir, tool_bin_dir=temp_dir)
-            uv.tool_install_local(source_path, self.name, extra_path=[temp_dir])
-            scripts = self._install_scripts(temp_dir, bin_dir)
+            uv_tool_bin_dir = temp_dir / "bin"
+            requirements_file = temp_dir / "requirements.txt"
+
+            uv = Uv(uv_binary, tool_dir=self.app_dir, tool_bin_dir=uv_tool_bin_dir)
+
+            if locked:
+                uv.export(source_path, requirements_file)
+                uv.tool_install_local(source_path, self.name, extra_path=[uv_tool_bin_dir], requirements=requirements_file)
+            else:
+                uv.tool_install_local(source_path, self.name, extra_path=[uv_tool_bin_dir])
+
+            scripts = self._install_scripts(uv_tool_bin_dir, bin_dir)
 
             metadata = AppMetadata()
             metadata.scripts.extend(scripts)

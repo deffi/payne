@@ -28,14 +28,6 @@ Test plan
 When installing from package index:
   * Fetch sdist to temporary directory
 
-Generate temporary `requirements.txt` with  locked dependency version
-  * `uv export --no-dev --no-emit-project --frozen --no-header --no-hashes --out-file $temp_requirements`
-
-Installation:
-  * `uv tool install --constraints $temp_requirements ...`
-    * Will --constraints work for indirect dependencies?
-    * If that doesn't work, then use `uv add -r` with temporary requirements
-
 
 
 # Desired functionality
