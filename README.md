@@ -12,6 +12,17 @@ re-install applications.
 
 Before running the tests, run `scripts/build-test-data.py`
 
+When testing manually, start an HTTP server in `run`...:
+
+    uv tool run python -m http.server -d run
+
+...and set UV_INDEX
+    
+    UV_INDEX=payne_test_data=http://localhost:8000/payne_test_data
+
+The automated tests run their own server, but will use the already running one
+if there is one.
+
 
 ## Etymology
 
