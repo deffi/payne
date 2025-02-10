@@ -38,7 +38,7 @@ class TestPayneLocal:
         return script_files
 
     @pytest.mark.parametrize("source", ["local", "remote"])
-    def test_install_from_local_uninstall(self, source):
+    def test_install_uninstall(self, source):
         with TemporaryDirectory() as temp_dir:
             def install_app(name: str, version: str):
                 match source:
