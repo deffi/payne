@@ -27,3 +27,8 @@ dev = [
 exclude = [
   ".venv*",
 ]
+
+[tool.pytest.ini_options]
+markers = [
+    "test_data: tests related to the test data",
+]

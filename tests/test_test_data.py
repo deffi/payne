@@ -12,6 +12,7 @@ from fixtures.index_server import index_server
 from dirs import test_data
 
 
+@pytest.mark.test_data
 class TestTestData:
     # Since we're using uv to run a uv project, the lockfile will be honored and
     # all dependencies will be at the .0 version, as locked. The project version
