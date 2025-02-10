@@ -28,6 +28,9 @@ Test plan
 When installing from package index:
   * Fetch sdist to temporary directory
 
+Error handling:
+  * If the testdata server isn't running, installing foo fails, but it will
+    still look like it is installed because the directory exists
 
 
 # Desired functionality
@@ -55,6 +58,9 @@ Should we allow installing an app under a different name than the package name?
 This might be useful if we want to install packages with the same name from
 different repositories, or from a repository and from a local directory. But
 we'd also be likely to get conflicting scripts names.
+
+Uninstalling corrupted app installations (e. g. metadata file missing or can't
+be read)
 
 
 # Open questions
