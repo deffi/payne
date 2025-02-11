@@ -7,24 +7,6 @@ Identify paths:
   * bin directory: ~/.local/bin
 
 
-## Locked dependencies
-
-set -x UV_INDEX payne_test_data=http://localhost:8000/payne_test_data
-
-Test plan
-  * baz
-    * 1.1.0
-    * 1.1.1
-  * bar -> baz
-    * All locked baz@1.1.0 -> locked   install bar 1.2.x, baz 1.1.0
-    * 1.2.0 -> bar*        -> unlocked install bar 1.2.0, baz 1.1.1
-    * 1.2.1 -> bar*        -> unlocked install bar 1.2.1, baz 1.1.1
-  * foo -> bar (-> baz)
-    * All locked bar@1.2.0, baz@1.1.0 -> locked   install foo 1.3.x, bar 1.2.0, baz 1.1.0
-    * 1.3.0 -> bar*                   -> unlocked install foo 1.3.0, bar 1.2.1, baz 1.1.1
-    * 1.3.1 -> bar==1.2.0             -> unlocked install foo 1.3.1, bar 1.2.0, baz 1.1.1
-    * 1.3.2 -> bar==1.2.0, baz=1.1.0  -> unlocked install foo 1.3.2, bar 1.2.0, baz 1.1.0
-
 
 # Desired functionality
 

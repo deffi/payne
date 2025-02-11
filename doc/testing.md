@@ -1,0 +1,96 @@
+# Test data
+
+Since Payne handles Python projects (applications and libraries), we need some
+projects for testing it.
+
+The versions of the projects have an *x.y.z* scheme:
+  * *x* designates a set of related projects
+  * *y* designates a project within the set
+  * *z* designates a version of the project
+
+Thus, version numbers are unique even across projects.
+
+
+## Set 1 (foo, bar, baz)
+
+To test transitive dependencies, we have three projects with dependencies like
+this:
+  * `foo` -> `bar`
+  * `bar` -> `baz`
+  * `baz`
+
+The only thing that the projects to is to output their version. Conceptually,
+`bar` and `baz` are libraries, although they do have a script so they can be
+tested in isolation.
+
+`baz` (project 1) has two versions:
+  * 1.1.0
+  * 1.1.1
+
+`bar` (project 2) has two versions:
+  * 1.2.0
+  * 1.2.1
+
+Both of them depend on an unspecified version of `baz`, and both are locked to
+`baz` 1.1.0 (i.e., the earliest version). Therefore:
+  * For unlocked install, we expect `baz` 1.1.1 (the latest version)
+  * For locked install, we expect `baz` 1.1.0 (the locked version, even though a
+    later version is available)
+
+`foo` (project 3) has three versions:
+  * 1.3.0 depends on an unspecified version of `bar`
+  * 1.3.1 depends on `bar` 1.2.0, which in turn depends on an unspecified
+    version of `baz`
+  * 1.3.2 also depends on `bar` 1.2.0 and additionally on `baz` 1.1.0
+
+All three of them are locked to `baz` 1.1.0 and `bar` 1.2.0 (i.e., the earliest
+version for each). Thus:
+  * For unlocked install, we expect:
+    * `foo` 1.3.0: `bar` 1.2.1, `baz` 1.1.1 (the latest versions)
+    * `foo` 1.3.1: `bar` 1.2.0, `baz` 1.1.1 (specific version of `bar`, but
+      unspecified transient dependency `baz`)
+    * `foo` 1.3.2: `bar` 1.2.0, `baz` 1.1.0 (specific version of both; the
+      direct dependency on `baz` forces 1.1.0 even though as a dependency of
+      `bar`, it is unspecified)
+  * For locked install, we expect `bar` 1.2.0 and `baz` 1.1.0 (the locked
+    version, even though a later version is available)
+
+
+# Building the test projects
+
+Before running any tests that use the test projects, they must be built. This is
+done by `scripts/build-test-data.py`, which invokes `uv build` on each of the
+projects. The results are placed in `run/payne_test_data`.
+
+
+# Serving the test projects
+
+Since Payne installs dependencies from a package repository, we need some
+packages in a local package repository.
+
+To run the local package repository manually, start a web server on
+`localhost:8000` that serves the contents of `run`. This can be
+accomplished by running in the project root:
+
+    uv run python -m http.server -d run
+
+The repository is then available at http://localhost:8000/payne_test_data.
+
+The automated tests run their own server on the same port by importing an
+auto-use `pytest` fixture. This server will run in a separate thread. If a
+server has already been started manually, the extra server will fail to start
+and the existing server will be used.
+
+
+## Testing the server
+
+With the server running, it should be possible to run
+
+    export UV_INDEX=payne_test_data=http://localhost:8000/payne_test_data
+    uv tool run foo
+
+This should result in
+
+    This is foo 1.3.2
+    This is bar 1.2.0
+    This is baz 1.1.0

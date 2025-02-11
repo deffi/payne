@@ -23,6 +23,8 @@ When testing manually, start an HTTP server in `run`...:
 The automated tests run their own server, but will use the already running one
 if there is one.
 
+See `doc/testing.md` for details.
+
 
 ## Etymology
 
