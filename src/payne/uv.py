@@ -69,14 +69,14 @@ class Uv:
             name,
         ], extra_path=extra_path)
 
-    def export(self, project_path: Path, output_file: Path):
-        return self._run([
-            "export",
-            "--project", project_path,
-            "--no-dev",
-            "--no-emit-project",
-            "--frozen",
-            "--no-header",
-            "--no-hashes",
-            "--output-file", output_file,
-        ])
+    # def export(self, project_path: Path, output_file: Path):
+    #     return self._run([
+    #         "export",
+    #         "--project", project_path,
+    #         "--no-dev",
+    #         "--no-emit-project",
+    #         "--frozen",
+    #         "--no-header",
+    #         "--no-hashes",
+    #         "--output-file", output_file,
+    #     ])

@@ -3,7 +3,7 @@ from pathlib import Path
 import shutil
 
 
-from payne import App, Pyproject
+from payne import App, Project
 
 
 class Payne:
@@ -33,8 +33,8 @@ class Payne:
         print(f"Bin directory:  {self.bin_dir}")
 
     def install_from_local(self, source_path: Path, locked: bool = False):  # TODO remove default
-        pyproject = Pyproject.load(source_path / "pyproject.toml")
-        app = App(self.apps_dir, pyproject.name(), pyproject.version())
+        project = Project(source_path)
+        app = App(self.apps_dir, project.name(), project.version())
 
         if app.is_installed():
             # TODO allow reinstall
@@ -42,8 +42,8 @@ class Payne:
             # TODO factor out "{app.name} {app.version}"
             print(f"{app.name} {app.version} is already installed")
         else:
-            print(f"Install {app.name} {app.version} from {source_path}")
-            app.install_from_local(source_path, self.bin_dir, self.uv_binary, locked)
+            print(f"Install {app.name} {app.version} from {project.root}")
+            app.install_from_local(project, self.bin_dir, self.uv_binary, locked)
 
         # TODO roll back if it fails (e.g., script already exists)
 
