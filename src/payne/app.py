@@ -6,12 +6,11 @@ import shutil
 from tempfile import TemporaryDirectory
 from typing import Self
 
-from payne import AppMetadata, Uv, Project, Installer
-from payne.download import download_and_unpack_sdist
+from payne import AppMetadata, Project, Installer
 
 
 class App:
-    def __init__(self, apps_dir, name: str, version: str):
+    def __init__(self, apps_dir: Path, name: str, version: str):
         self._apps_dir = apps_dir
         self._name = name
         self._version = version
@@ -82,24 +81,18 @@ class App:
             metadata.scripts.extend(scripts)
             self.write_metadata(metadata)
 
-    def uninstall(self, uv_binary: Path):
+    def uninstall(self):
         metadata = self.read_metadata()
 
         for script in metadata.scripts:
             print(f"Uninstall script {script}")
             script.unlink(missing_ok=True)
 
-        # TODO remove metadata file
-
-        # Use a temporary tool bin dir for uv so it doesn't uninstall scripts
-        # that we didn't install
-        with TemporaryDirectory() as temp_dir:
-            temp_dir = Path(temp_dir)
-            uv = Uv(uv_binary, tool_dir=self.app_dir, tool_bin_dir=temp_dir)
-            uv.tool_uninstall(self.name)
-
-        # TODO remove app dir if it still exists, and output a warning if it
-        # isn't empty
+        shutil.rmtree(self.app_dir)
+        # TODO factor out self.(directory that contains the app dirs for the individual versions)
+        # TODO factor out is_empty
+        if not any((self._apps_dir / self._name).iterdir()):
+            (self._apps_dir / self._name).rmdir()
 
     # Metadata #################################################################
 

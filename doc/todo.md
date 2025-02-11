@@ -40,8 +40,6 @@ be read)
 Don't re-use UV_* environment variables, use PAYNE_* or command line arguments
 instead
 
-Apps can be uninstalled by deleting the entire app dir
-
 What is currently called "app" should be "app version", and then we can use
 "app" for the unit of all installed versions of an app.
 

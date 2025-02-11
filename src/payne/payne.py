@@ -63,7 +63,7 @@ class Payne:
 
         if app.is_installed():
             print(f"Uninstall {package_name} {version}")
-            app.uninstall(self.uv_binary)
+            app.uninstall()
         else:
             print(f"{package_name} {version} is not installed")
 
