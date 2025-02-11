@@ -48,7 +48,7 @@ version for each). Thus:
   * For unlocked install, we expect:
     * `foo` 1.3.0: `bar` 1.2.1, `baz` 1.1.1 (the latest versions)
     * `foo` 1.3.1: `bar` 1.2.0, `baz` 1.1.1 (specific version of `bar`, but
-      unspecified transient dependency `baz`)
+      latest version of `baz` - even though it is locked to 1.1.0 in `bar`)
     * `foo` 1.3.2: `bar` 1.2.0, `baz` 1.1.0 (specific version of both; the
       direct dependency on `baz` forces 1.1.0 even though as a dependency of
       `bar`, it is unspecified)

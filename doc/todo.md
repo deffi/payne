@@ -62,16 +62,9 @@ Can uv have a dynamic version in `pyproject.toml`?
 
 # Future work
 
-Support packages from PyPI
-  * Download sdist
-  * Unpack to temporary directory
-  * Need to check `pyproject.toml` conditions after unpacking rather than before
-    copying
-
-Install from local archive
-https://packaging.python.org/en/latest/guides/installing-using-pip-and-virtual-environments/
-
 Other sources?
+  * Local archive
+    https://packaging.python.org/en/latest/guides/installing-using-pip-and-virtual-environments/
   * Git
   * SVN
 
@@ -89,17 +82,12 @@ Handle conflicts between multiple packages that declare the same script
 
 Support installing with venv instead of uv
 
-Ensure that even if a library has a lockfile, only tha app lockfile is used.
-
 
 # Tests
 
 Re-install an app
 Uninstall a non-installed app
 
+CLI tests (mock class Payne)
+
 End-to-end tests
-
-
-# Documentation
-
-Details on test data
