@@ -25,9 +25,6 @@ Test plan
     * 1.3.1 -> bar==1.2.0             -> unlocked install foo 1.3.1, bar 1.2.0, baz 1.1.1
     * 1.3.2 -> bar==1.2.0, baz=1.1.0  -> unlocked install foo 1.3.2, bar 1.2.0, baz 1.1.0
 
-When installing from package index:
-  * Fetch sdist to temporary directory
-
 Error handling:
   * If the testdata server isn't running, installing foo fails, but it will
     still look like it is installed because the directory exists

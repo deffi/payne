@@ -47,7 +47,8 @@ class Payne:
 
         # TODO roll back if it fails (e.g., script already exists)
 
-    def install_from_remote(self, name: str, version: str):
+    def install_from_remote(self, name: str, version: str, locked: bool = False,
+                            extra_index_urls: list[str] | None = None):  # TODO remove default
         app = App(self.apps_dir, name, version)
 
         if app.is_installed():
@@ -55,7 +56,7 @@ class Payne:
             print(f"{app.name} {app.version} is already installed")
         else:
             print(f"Install {app.name} {app.version}")
-            app.install_from_remote(self.bin_dir, self.uv_binary)
+            app.install_from_remote(self.bin_dir, self.uv_binary, locked, extra_index_urls)
 
     def uninstall(self, package_name: str, version: str):
         app = App(self.apps_dir, package_name, version)

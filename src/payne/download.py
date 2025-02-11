@@ -3,7 +3,8 @@ from pathlib import Path
 from unearth import PackageFinder
 
 
-def download_and_unpack_sdist(name: str, version: str, target: Path, extra_index_urls: list[str] = None) -> Path:
+# TODO remove default
+def download_and_unpack_sdist(name: str, version: str, target: Path, extra_index_urls: list[str] | None = None) -> Path:
     """Downloads and unpacks a source distribution package
 
     One might assume that this functionality would be available in pip. But

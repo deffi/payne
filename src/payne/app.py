@@ -7,6 +7,7 @@ from tempfile import TemporaryDirectory
 from typing import Self
 
 from payne import AppMetadata, Uv
+from payne.download import download_and_unpack_sdist
 
 
 class App:
@@ -65,7 +66,8 @@ class App:
 
             if locked:
                 uv.export(source_path, requirements_file)
-                uv.tool_install_local(source_path, self.name, extra_path=[uv_tool_bin_dir], requirements=requirements_file)
+                uv.tool_install_local(source_path, self.name, extra_path=[uv_tool_bin_dir],
+                                      requirements=requirements_file)
             else:
                 uv.tool_install_local(source_path, self.name, extra_path=[uv_tool_bin_dir])
 
@@ -75,12 +77,25 @@ class App:
             metadata.scripts.extend(scripts)
             self.write_metadata(metadata)
 
-    def install_from_remote(self, bin_dir: Path, uv_binary: Path):
+    def install_from_remote(self, bin_dir: Path, uv_binary: Path, locked: bool,
+                            extra_index_urls: list[str] | None = None):
         with TemporaryDirectory() as temp_dir:
             temp_dir = Path(temp_dir)
-            uv = Uv(uv_binary, tool_dir=self.app_dir, tool_bin_dir=temp_dir)
-            uv.tool_install_remote(self.name, self.version, extra_path=[temp_dir])
-            scripts = self._install_scripts(temp_dir, bin_dir)
+            uv_tool_bin_dir = temp_dir / "bin"
+            download_dir = temp_dir / "download"
+            requirements_file = temp_dir / "requirements.txt"
+
+            uv = Uv(uv_binary, tool_dir=self.app_dir, tool_bin_dir=uv_tool_bin_dir, )
+
+            if locked:
+                project_dir = download_and_unpack_sdist(self.name, self.version, download_dir, extra_index_urls)
+                uv.export(project_dir, requirements_file)
+                uv.tool_install_remote(self.name, self.version, extra_path=[uv_tool_bin_dir],
+                                       requirements=requirements_file)
+            else:
+                uv.tool_install_remote(self.name, self.version, extra_path=[uv_tool_bin_dir])
+
+            scripts = self._install_scripts(uv_tool_bin_dir, bin_dir)
 
             metadata = AppMetadata()
             metadata.scripts.extend(scripts)

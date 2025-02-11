@@ -23,7 +23,8 @@ class Uv:
         print(f"Calling uv: {shlex.join(map(str, call_args))}")
         return subprocess.check_call(call_args, env=env)
 
-    def tool_install_local(self, path: Path, package: str, extra_path: list[Path] = None, requirements: Path|None = None):  # TODO remove default
+    def tool_install_local(self, path: Path, package: str, extra_path: list[Path] = None,
+                           requirements: Path | None = None):  # TODO remove default
         # Re-install in case it's already installed and we missed it. Should
         # have raised an exception, but uv doesn't return an error code in this
         # case.
@@ -41,8 +42,14 @@ class Uv:
             package,
         ], extra_path=extra_path)
 
-    def tool_install_remote(self, package: str, version: str, extra_path: list[Path] = None):
+    def tool_install_remote(self, package: str, version: str, extra_path: list[Path] = None,
+                            requirements: Path | None = None):  # TODO remove default
         package_spec = f"{package}=={version}"
+
+        if requirements:
+            constraints = ["--constraints", requirements]
+        else:
+            constraints = []
 
         # Re-install in case it's already installed and we missed it. Should
         # have raised an exception, but uv doesn't return an error code in this
@@ -51,6 +58,7 @@ class Uv:
             "tool",
             "install",
             "--reinstall",
+            *constraints,
             package_spec,
         ], extra_path=extra_path)
 

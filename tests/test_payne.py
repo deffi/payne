@@ -106,7 +106,7 @@ class TestPayneLocal:
             assert self.installed_apps(apps_dir) == {}
             assert self.installed_scripts(bin_dir) == set()
 
-    @pytest.mark.parametrize("source", ["local"])
+    @pytest.mark.parametrize("source", ["remote", "remote"])
     def test_install_locked(self, source):
         with TemporaryDirectory() as temp_dir:
             # TODO duplication
@@ -115,7 +115,7 @@ class TestPayneLocal:
                     case "local":
                         payne.install_from_local(test_data / f"{name}-{version}", locked=True)
                     case "remote":
-                        payne.install_from_remote(name, version)
+                        payne.install_from_remote(name, version, locked=True, extra_index_urls=["http://localhost:8000/payne_test_data"])
                     case _:
                         assert False
 
