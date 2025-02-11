@@ -25,10 +25,6 @@ Test plan
     * 1.3.1 -> bar==1.2.0             -> unlocked install foo 1.3.1, bar 1.2.0, baz 1.1.1
     * 1.3.2 -> bar==1.2.0, baz=1.1.0  -> unlocked install foo 1.3.2, bar 1.2.0, baz 1.1.0
 
-Error handling:
-  * If the testdata server isn't running, installing foo fails, but it will
-    still look like it is installed because the directory exists
-
 
 # Desired functionality
 
@@ -56,8 +52,25 @@ This might be useful if we want to install packages with the same name from
 different repositories, or from a repository and from a local directory. But
 we'd also be likely to get conflicting scripts names.
 
-Uninstalling corrupted app installations (e. g. metadata file missing or can't
+Uninstalling corrupted app installations (e.g. metadata file missing or can't
 be read)
+
+For subprocesses, specify the entire environment to avoid accidentally picking
+up local configuration
+
+Don't re-use UV_* environment variables, use PAYNE_* or command line arguments
+instead
+
+Apps can be uninstalled by deleting the entire app dir
+
+What is currently called "app" should be "app version", and then we can use
+"app" for the unit of all installed versions of an app.
+
+
+# Error handling
+
+If the testdata server isn't running, installing foo fails, but it will still
+look like it is installed because the directory exists
 
 
 # Open questions
@@ -101,6 +114,8 @@ Ensure that even if a library has a lockfile, only tha app lockfile is used.
 
 Re-install an app
 Uninstall a non-installed app
+
+End-to-end tests
 
 
 # Documentation
