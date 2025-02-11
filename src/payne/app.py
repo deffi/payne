@@ -68,7 +68,9 @@ class App:
             metadata.scripts.extend(scripts)
             self.write_metadata(metadata)
 
+    # TODO very similar to install_From_local
     def install_from_remote(self, bin_dir: Path, locked: bool, extra_index_urls: list[str] | None = None):
+        # TODO factor out subclass of TemporaryDirectory that returns a Path
         with TemporaryDirectory() as temp_bin_dir:
             temp_bin_dir = Path(temp_bin_dir)
 

@@ -1,5 +1,4 @@
 import os
-from importlib.metadata import requires
 from pathlib import Path
 import shlex
 import subprocess
@@ -12,6 +11,7 @@ from payne.download import download_and_unpack_sdist
 class Installer:
     """Uses uv"""
 
+    # TODO accept Project
     def _uv_tool_install_project(self, path: Path, package: str, requirements: Path | None, target_dir: Path, tool_bin_dir: Path):
         # Re-install in case it's already installed and we missed it. Should
         # have raised an exception, but uv doesn't return an error code in this
@@ -38,6 +38,7 @@ class Installer:
         print(f"Calling uv: {shlex.join(map(str, args))}")
         return subprocess.run(args, env=env, check=True)
 
+    # TODO create class Package(name, version)
     # TOOD very similar to _uv_tool_install_project
     def _uv_tool_install_remote(self, package: str, version: str, requirements: Path | None, target_dir: Path, tool_bin_dir: Path):
         package_spec = f"{package}=={version}"
