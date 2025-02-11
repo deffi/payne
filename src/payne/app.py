@@ -6,7 +6,7 @@ import shutil
 from tempfile import TemporaryDirectory
 from typing import Self
 
-from payne import AppMetadata, Uv, Project
+from payne import AppMetadata, Uv, Project, Installer
 from payne.download import download_and_unpack_sdist
 
 
@@ -56,47 +56,27 @@ class App:
                 for version_dir in app_dir.iterdir():
                     yield cls(apps_dir, app_name, version_dir.name)
 
-    def install_from_local(self, project: Project, bin_dir: Path, uv_binary: Path, locked: bool):
-        with TemporaryDirectory() as temp_dir:
-            temp_dir = Path(temp_dir)
-            uv_tool_bin_dir = temp_dir / "bin"
-            requirements_file = temp_dir / "requirements.txt"
+    # TODO don't we need extra index URLs here so we know where to get dependencies?
+    def install_from_local(self, project: Project, bin_dir: Path, locked: bool):
+        with TemporaryDirectory() as temp_bin_dir:
+            temp_bin_dir = Path(temp_bin_dir)
 
-            uv = Uv(uv_binary, tool_dir=self.app_dir, tool_bin_dir=uv_tool_bin_dir)
+            Installer().install_project(project, self.app_dir, temp_bin_dir, locked)
 
-            if locked:
-                project.create_requirements_from_lock_file(requirements_file)
-                uv.tool_install_local(project.root, self.name, extra_path=[uv_tool_bin_dir],
-                                      requirements=requirements_file)
-            else:
-                uv.tool_install_local(project.root, self.name, extra_path=[uv_tool_bin_dir])
-
-            scripts = self._install_scripts(uv_tool_bin_dir, bin_dir)
+            scripts = self._install_scripts(temp_bin_dir, bin_dir)
 
             metadata = AppMetadata()
             metadata.scripts.extend(scripts)
             self.write_metadata(metadata)
 
-    def install_from_remote(self, bin_dir: Path, uv_binary: Path, locked: bool,
-                            extra_index_urls: list[str] | None = None):
-        with TemporaryDirectory() as temp_dir:
-            temp_dir = Path(temp_dir)
-            uv_tool_bin_dir = temp_dir / "bin"
-            download_dir = temp_dir / "download"
-            requirements_file = temp_dir / "requirements.txt"
+    def install_from_remote(self, bin_dir: Path, locked: bool, extra_index_urls: list[str] | None = None):
+        with TemporaryDirectory() as temp_bin_dir:
+            temp_bin_dir = Path(temp_bin_dir)
 
-            uv = Uv(uv_binary, tool_dir=self.app_dir, tool_bin_dir=uv_tool_bin_dir, )
+            # TODO should not be self.name?
+            Installer().install_from_remote(self.name, self.version, self.app_dir, temp_bin_dir, locked, extra_index_urls)
 
-            if locked:
-                project_dir = download_and_unpack_sdist(self.name, self.version, download_dir, extra_index_urls)
-                project = Project(project_dir)
-                project.create_requirements_from_lock_file(requirements_file)
-                uv.tool_install_remote(self.name, self.version, extra_path=[uv_tool_bin_dir],
-                                       requirements=requirements_file)
-            else:
-                uv.tool_install_remote(self.name, self.version, extra_path=[uv_tool_bin_dir])
-
-            scripts = self._install_scripts(uv_tool_bin_dir, bin_dir)
+            scripts = self._install_scripts(temp_bin_dir, bin_dir)
 
             metadata = AppMetadata()
             metadata.scripts.extend(scripts)

@@ -37,9 +37,6 @@ we'd also be likely to get conflicting scripts names.
 Uninstalling corrupted app installations (e.g. metadata file missing or can't
 be read)
 
-For subprocesses, specify the entire environment to avoid accidentally picking
-up local configuration
-
 Don't re-use UV_* environment variables, use PAYNE_* or command line arguments
 instead
 
@@ -53,6 +50,14 @@ What is currently called "app" should be "app version", and then we can use
 
 If the testdata server isn't running, installing foo fails, but it will still
 look like it is installed because the directory exists
+
+
+# Robustness
+
+All subprocess invocations:
+  * Controlled environment (specify the entire environment to avoid accidentally
+    picking up local configuration)
+  * Controlled PWD
 
 
 # Open questions

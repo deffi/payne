@@ -43,7 +43,7 @@ class Payne:
             print(f"{app.name} {app.version} is already installed")
         else:
             print(f"Install {app.name} {app.version} from {project.root}")
-            app.install_from_local(project, self.bin_dir, self.uv_binary, locked)
+            app.install_from_local(project, self.bin_dir, locked)
 
         # TODO roll back if it fails (e.g., script already exists)
 
@@ -56,7 +56,7 @@ class Payne:
             print(f"{app.name} {app.version} is already installed")
         else:
             print(f"Install {app.name} {app.version}")
-            app.install_from_remote(self.bin_dir, self.uv_binary, locked, extra_index_urls)
+            app.install_from_remote(self.bin_dir, locked, extra_index_urls)
 
     def uninstall(self, package_name: str, version: str):
         app = App(self.apps_dir, package_name, version)
