@@ -3,7 +3,8 @@ from pathlib import Path
 import shutil
 
 
-from payne import App, Project
+from payne.app import App
+from payne.project import Project
 
 
 class Payne:

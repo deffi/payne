@@ -3,7 +3,7 @@ from pathlib import Path
 import shlex
 import subprocess
 
-from payne import Project
+from payne.project import Project
 from payne.download import download_and_unpack_sdist
 from payne.util.temp_file import TemporaryDirectory
 

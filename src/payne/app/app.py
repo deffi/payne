@@ -5,7 +5,9 @@ from pathlib import Path
 import shutil
 from typing import Self
 
-from payne import AppMetadata, Project, Installer
+from payne.app import AppMetadata
+from payne.project import Project
+from payne import Installer
 from payne.util.path import is_empty
 from payne.util.temp_file import TemporaryDirectory
 

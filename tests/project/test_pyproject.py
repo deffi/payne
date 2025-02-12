@@ -1,4 +1,4 @@
-from payne import Pyproject
+from payne.project import Pyproject
 
 
 class TestPyproject:

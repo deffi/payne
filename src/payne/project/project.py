@@ -3,7 +3,7 @@ from pathlib import Path
 import shlex
 import subprocess
 
-from payne import Pyproject
+from payne.project import Pyproject
 
 
 class Project:
