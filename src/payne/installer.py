@@ -12,8 +12,7 @@ from payne.package import Package
 class Installer:
     """Uses uv"""
 
-    # TODO accept Project
-    def _uv_tool_install_project(self, path: Path, package: str, requirements: Path | None, target_dir: Path, tool_bin_dir: Path):
+    def _uv_tool_install_project(self, project: Project, requirements: Path | None, target_dir: Path, tool_bin_dir: Path):
         # Re-install in case it's already installed and we missed it. Should
         # have raised an exception, but uv doesn't return an error code in this
         # case.
@@ -27,9 +26,9 @@ class Installer:
             "tool",
             "install",
             "--reinstall",
-            "--from", path,
+            "--from", project.root,
             *constraints,
-            package,
+            project.name(),
         ]
 
         env = os.environ.copy()
@@ -71,9 +70,9 @@ class Installer:
             if locked:
                 requirements_file = temp_dir / "requirements.txt"
                 project.create_requirements_from_lock_file(requirements_file)
-                self._uv_tool_install_project(project.root, project.name(), requirements=requirements_file, target_dir=app_dir, tool_bin_dir=bin_dir)
+                self._uv_tool_install_project(project, requirements=requirements_file, target_dir=app_dir, tool_bin_dir=bin_dir)
             else:
-                self._uv_tool_install_project(project.root, project.name(), requirements=None, target_dir=app_dir, tool_bin_dir=bin_dir)
+                self._uv_tool_install_project(project, requirements=None, target_dir=app_dir, tool_bin_dir=bin_dir)
 
     # TODO similar to install_project
     def install_from_remote(self, package: Package, app_dir: Path, bin_dir: Path, locked: bool, extra_index_urls: list[str] | None = None):
