@@ -7,6 +7,7 @@ from tempfile import TemporaryDirectory
 from typing import Self
 
 from payne import AppMetadata, Project, Installer
+from payne.util.path import is_empty
 
 
 class App:
@@ -93,7 +94,7 @@ class App:
         shutil.rmtree(self.app_dir)
         # TODO factor out self.(directory that contains the app dirs for the individual versions)
         # TODO factor out is_empty
-        if not any((self._apps_dir / self._name).iterdir()):
+        if is_empty(self._apps_dir / self._name):
             (self._apps_dir / self._name).rmdir()
 
     # Metadata #################################################################
