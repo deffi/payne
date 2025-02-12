@@ -12,54 +12,35 @@ from payne.package import Package
 class Installer:
     """Uses uv"""
 
-    def _uv_tool_install_project(self, project: Project, requirements: Path | None, target_dir: Path, tool_bin_dir: Path):
-        # Re-install in case it's already installed and we missed it. Should
-        # have raised an exception, but uv doesn't return an error code in this
-        # case.
+    def _uv_tool_install(self, source: Project | Package, requirements: Path | None, target_dir: Path, bin_dir: Path):
         if requirements:
             constraints = ["--constraints", requirements]
         else:
             constraints = []
 
+        match source:
+            case Project() as project:
+                source_args = ["--from", project.root, project.name()]
+            case Package() as package:
+                source_args = [package.requirement_specifier()]
+            case _:
+                raise TypeError(f"Unrecognized source: {source}")
+
+        # Re-install in case it's already installed and we missed it. Should
+        # have raised an exception, but uv doesn't return an error code in this
+        # case.
         args = [
             "uv",
             "tool",
             "install",
             "--reinstall",
-            "--from", project.root,
             *constraints,
-            project.name(),
+            *source_args,
         ]
 
         env = os.environ.copy()
         env["UV_TOOL_DIR"] = str(target_dir)
-        env["UV_TOOL_BIN_DIR"] = str(tool_bin_dir)
-
-        print(f"Calling uv: {shlex.join(map(str, args))}")
-        return subprocess.run(args, env=env, check=True)
-
-    # TOOD very similar to _uv_tool_install_project
-    def _uv_tool_install_remote(self, package: Package, requirements: Path | None, target_dir: Path, tool_bin_dir: Path):
-        if requirements:
-            constraints = ["--constraints", requirements]
-        else:
-            constraints = []
-
-        # Re-install in case it's already installed and we missed it. Should
-        # have raised an exception, but uv doesn't return an error code in this
-        # case.
-        args=[
-            "uv",
-            "tool",
-            "install",
-            "--reinstall",
-            *constraints,
-            package.requirement_specifier(),
-        ]
-
-        env = os.environ.copy()
-        env["UV_TOOL_DIR"] = str(target_dir)
-        env["UV_TOOL_BIN_DIR"] = str(tool_bin_dir)
+        env["UV_TOOL_BIN_DIR"] = str(bin_dir)
 
         print(f"Calling uv: {shlex.join(map(str, args))}")
         return subprocess.run(args, env=env, check=True)
@@ -70,20 +51,20 @@ class Installer:
             if locked:
                 requirements_file = temp_dir / "requirements.txt"
                 project.create_requirements_from_lock_file(requirements_file)
-                self._uv_tool_install_project(project, requirements=requirements_file, target_dir=app_dir, tool_bin_dir=bin_dir)
+                self._uv_tool_install(project, requirements=requirements_file, target_dir=app_dir, bin_dir=bin_dir)
             else:
-                self._uv_tool_install_project(project, requirements=None, target_dir=app_dir, tool_bin_dir=bin_dir)
+                self._uv_tool_install(project, requirements=None, target_dir=app_dir, bin_dir=bin_dir)
 
     # TODO similar to install_project
     def install_from_remote(self, package: Package, app_dir: Path, bin_dir: Path, locked: bool, extra_index_urls: list[str] | None = None):
         # TODO only used if locked
         with TemporaryDirectory() as temp_dir:
             download_dir = temp_dir / "download"
-            requirements_file = temp_dir / "requirements.txt"
 
             if locked:
+                requirements_file = temp_dir / "requirements.txt"
                 project = Project(download_and_unpack_sdist(package, download_dir, extra_index_urls))
                 project.create_requirements_from_lock_file(requirements_file)
-                self._uv_tool_install_remote(package, requirements=requirements_file, target_dir=app_dir, tool_bin_dir=bin_dir)
+                self._uv_tool_install(package, requirements=requirements_file, target_dir=app_dir, bin_dir=bin_dir)
             else:
-                self._uv_tool_install_remote(package, requirements=None, target_dir=app_dir, tool_bin_dir=bin_dir)
+                self._uv_tool_install(package, requirements=None, target_dir=app_dir, bin_dir=bin_dir)

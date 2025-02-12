@@ -5,6 +5,7 @@ import shutil
 
 from payne.app import App
 from payne.project import Project
+from payne.package import Package
 
 
 class Payne:
@@ -50,6 +51,7 @@ class Payne:
 
     def install_from_remote(self, name: str, version: str, locked: bool = False,
                             extra_index_urls: list[str] | None = None):  # TODO remove default
+        package = Package(name, version)
         app = App(self.apps_dir, name, version)
 
         if app.is_installed():
@@ -57,7 +59,7 @@ class Payne:
             print(f"{app.name} {app.version} is already installed")
         else:
             print(f"Install {app.name} {app.version}")
-            app.install_from_remote(self.bin_dir, locked, extra_index_urls)
+            app.install_from_remote(package, self.bin_dir, locked, extra_index_urls)
 
     def uninstall(self, package_name: str, version: str):
         app = App(self.apps_dir, package_name, version)
