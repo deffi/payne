@@ -83,8 +83,7 @@ class Installer:
             requirements_file = temp_dir / "requirements.txt"
 
             if locked:
-                project_dir = download_and_unpack_sdist(package, download_dir, extra_index_urls)
-                project = Project(project_dir)  # TODO return directly from downloader
+                project = Project(download_and_unpack_sdist(package, download_dir, extra_index_urls))
                 project.create_requirements_from_lock_file(requirements_file)
                 self._uv_tool_install_remote(package, requirements=requirements_file, target_dir=app_dir, tool_bin_dir=bin_dir)
             else:
