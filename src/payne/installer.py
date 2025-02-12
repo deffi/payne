@@ -2,10 +2,10 @@ import os
 from pathlib import Path
 import shlex
 import subprocess
-from tempfile import TemporaryDirectory
 
 from payne import Project
 from payne.download import download_and_unpack_sdist
+from payne.util.temp_file import TemporaryDirectory
 
 
 class Installer:
@@ -70,8 +70,6 @@ class Installer:
     def install_project(self, project: Project, app_dir: Path, bin_dir: Path, locked: bool):
         # TODO only used if locked
         with TemporaryDirectory() as temp_dir:
-            temp_dir = Path(temp_dir)
-
             if locked:
                 requirements_file = temp_dir / "requirements.txt"
                 project.create_requirements_from_lock_file(requirements_file)
@@ -83,7 +81,6 @@ class Installer:
     def install_from_remote(self, package_name: str, package_version: str, app_dir: Path, bin_dir: Path, locked: bool, extra_index_urls: list[str] | None = None):
         # TODO only used if locked
         with TemporaryDirectory() as temp_dir:
-            temp_dir = Path(temp_dir)
             download_dir = temp_dir / "download"
             requirements_file = temp_dir / "requirements.txt"
 

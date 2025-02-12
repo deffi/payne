@@ -3,11 +3,11 @@ from functools import cached_property
 import json
 from pathlib import Path
 import shutil
-from tempfile import TemporaryDirectory
 from typing import Self
 
 from payne import AppMetadata, Project, Installer
 from payne.util.path import is_empty
+from payne.util.temp_file import TemporaryDirectory
 
 
 class App:
@@ -59,8 +59,6 @@ class App:
     # TODO don't we need extra index URLs here so we know where to get dependencies?
     def install_from_local(self, project: Project, bin_dir: Path, locked: bool):
         with TemporaryDirectory() as temp_bin_dir:
-            temp_bin_dir = Path(temp_bin_dir)
-
             Installer().install_project(project, self.app_dir, temp_bin_dir, locked)
 
             scripts = self._install_scripts(temp_bin_dir, bin_dir)
@@ -71,10 +69,7 @@ class App:
 
     # TODO very similar to install_From_local
     def install_from_remote(self, bin_dir: Path, locked: bool, extra_index_urls: list[str] | None = None):
-        # TODO factor out subclass of TemporaryDirectory that returns a Path
         with TemporaryDirectory() as temp_bin_dir:
-            temp_bin_dir = Path(temp_bin_dir)
-
             # TODO should not be self.name?
             Installer().install_from_remote(self.name, self.version, self.app_dir, temp_bin_dir, locked, extra_index_urls)
 
