@@ -10,6 +10,7 @@ from payne.project import Project
 from payne import Installer
 from payne.util.path import is_empty
 from payne.util.temp_file import TemporaryDirectory
+from payne.package import Package
 
 
 class App:
@@ -69,11 +70,14 @@ class App:
             metadata.scripts.extend(scripts)
             self.write_metadata(metadata)
 
+    def corresponding_package(self) -> Package:
+        return Package(self.name, self.version)
+
     # TODO very similar to install_From_local
     def install_from_remote(self, bin_dir: Path, locked: bool, extra_index_urls: list[str] | None = None):
         with TemporaryDirectory() as temp_bin_dir:
-            # TODO should not be self.name?
-            Installer().install_from_remote(self.name, self.version, self.app_dir, temp_bin_dir, locked, extra_index_urls)
+            # TODO should not be self.corresponding_package?
+            Installer().install_from_remote(self.corresponding_package(), self.app_dir, temp_bin_dir, locked, extra_index_urls)
 
             scripts = self._install_scripts(temp_bin_dir, bin_dir)
 

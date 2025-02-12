@@ -6,6 +6,7 @@ import subprocess
 from payne.project import Project
 from payne.download import download_and_unpack_sdist
 from payne.util.temp_file import TemporaryDirectory
+from payne.package import Package
 
 
 class Installer:
@@ -38,11 +39,8 @@ class Installer:
         print(f"Calling uv: {shlex.join(map(str, args))}")
         return subprocess.run(args, env=env, check=True)
 
-    # TODO create class Package(name, version)
     # TOOD very similar to _uv_tool_install_project
-    def _uv_tool_install_remote(self, package: str, version: str, requirements: Path | None, target_dir: Path, tool_bin_dir: Path):
-        package_spec = f"{package}=={version}"
-
+    def _uv_tool_install_remote(self, package: Package, requirements: Path | None, target_dir: Path, tool_bin_dir: Path):
         if requirements:
             constraints = ["--constraints", requirements]
         else:
@@ -57,7 +55,7 @@ class Installer:
             "install",
             "--reinstall",
             *constraints,
-            package_spec,
+            package.requirement_specifier(),
         ]
 
         env = os.environ.copy()
@@ -78,16 +76,16 @@ class Installer:
                 self._uv_tool_install_project(project.root, project.name(), requirements=None, target_dir=app_dir, tool_bin_dir=bin_dir)
 
     # TODO similar to install_project
-    def install_from_remote(self, package_name: str, package_version: str, app_dir: Path, bin_dir: Path, locked: bool, extra_index_urls: list[str] | None = None):
+    def install_from_remote(self, package: Package, app_dir: Path, bin_dir: Path, locked: bool, extra_index_urls: list[str] | None = None):
         # TODO only used if locked
         with TemporaryDirectory() as temp_dir:
             download_dir = temp_dir / "download"
             requirements_file = temp_dir / "requirements.txt"
 
             if locked:
-                project_dir = download_and_unpack_sdist(package_name, package_version, download_dir, extra_index_urls)
+                project_dir = download_and_unpack_sdist(package, download_dir, extra_index_urls)
                 project = Project(project_dir)  # TODO return directly from downloader
                 project.create_requirements_from_lock_file(requirements_file)
-                self._uv_tool_install_remote(package_name, package_version, requirements=requirements_file, target_dir=app_dir, tool_bin_dir=bin_dir)
+                self._uv_tool_install_remote(package, requirements=requirements_file, target_dir=app_dir, tool_bin_dir=bin_dir)
             else:
-                self._uv_tool_install_remote(package_name, package_version, requirements=None, target_dir=app_dir, tool_bin_dir=bin_dir)
+                self._uv_tool_install_remote(package, requirements=None, target_dir=app_dir, tool_bin_dir=bin_dir)
