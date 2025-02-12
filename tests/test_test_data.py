@@ -1,10 +1,10 @@
 import os
 import subprocess
-from tempfile import TemporaryDirectory
 
 import pytest
 
 import payne
+from payne.util.temp_file import TemporaryDirectory
 
 # Need this to be in scope so it can be autoused
 # noinspection PyUnresolvedReferences
@@ -35,7 +35,7 @@ class TestTestData:
         with TemporaryDirectory() as temp_dir:
             env = os.environ.copy()
             del env["VIRTUAL_ENV"]
-            env["UV_PROJECT_ENVIRONMENT"] = temp_dir
+            env["UV_PROJECT_ENVIRONMENT"] = str(temp_dir)
             env["UV_INDEX"] = "payne_test_data=http://localhost:8000/payne_test_data"
 
             # Create the project environment and install the project
@@ -97,7 +97,7 @@ class TestTestData:
 
         with TemporaryDirectory() as temp_dir:
             env = os.environ.copy()
-            env["UV_TOOL_DIR"] = temp_dir
+            env["UV_TOOL_DIR"] = str(temp_dir)
             env["UV_INDEX"] = "payne_test_data=http://localhost:8000/payne_test_data"
 
             # Run the command as a tool

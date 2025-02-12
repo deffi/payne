@@ -1,11 +1,11 @@
 from pathlib import Path
-from tempfile import TemporaryDirectory
 import tomllib
 
 import pytest
 
 from payne.download import download_and_unpack_sdist
 from payne.package import Package
+from payne.util.temp_file import TemporaryDirectory
 
 # noinspection PyUnresolvedReferences
 from fixtures.index_server import index_server
@@ -18,8 +18,6 @@ class TestDownload:
     ])
     def test_download(self, package):
         with TemporaryDirectory() as temp_dir:
-            temp_dir = Path(temp_dir)
-
             # TODO factor out URL
             target = download_and_unpack_sdist(package, temp_dir, extra_index_urls=["http://localhost:8000/payne_test_data"])
 

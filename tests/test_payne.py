@@ -1,8 +1,8 @@
 import os
 from pathlib import Path
-from tempfile import TemporaryDirectory
 
 from payne import Payne
+from payne.util.temp_file import TemporaryDirectory
 
 import pytest
 
@@ -49,7 +49,6 @@ class TestPayneLocal:
                     case _:
                         assert False
 
-            temp_dir = Path(temp_dir)
             apps_dir = temp_dir / "apps"
             bin_dir = temp_dir / "bin"
 
@@ -119,7 +118,6 @@ class TestPayneLocal:
                     case _:
                         assert False
 
-            temp_dir = Path(temp_dir)
             apps_dir = temp_dir / "apps"
             bin_dir = temp_dir / "bin"
 
