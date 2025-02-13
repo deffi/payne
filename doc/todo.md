@@ -1,6 +1,12 @@
 # Basic functionality
 
-## Common
+Clarify configuration of extra package indices:
+  * Individual tool (uv and unearth so far)?
+    * We'll probably have this configured anyway
+    * Does unearth allow configuring this?
+  * Payne configuration that's passed on?
+    * Need multiple
+    * Need name:url
 
 Identify paths:
   * Apps directory: ~/.local/share/payne/apps
