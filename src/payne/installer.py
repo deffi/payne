@@ -46,25 +46,23 @@ class Installer:
         return subprocess.run(args, env=env, check=True)
 
     def install_project(self, project: Project, app_dir: Path, bin_dir: Path, locked: bool):
-        # TODO only used if locked
-        with TemporaryDirectory() as temp_dir:
-            if locked:
+        if locked:
+            with TemporaryDirectory() as temp_dir:
                 requirements_file = temp_dir / "requirements.txt"
                 project.create_requirements_from_lock_file(requirements_file)
                 self._uv_tool_install(project, requirements=requirements_file, target_dir=app_dir, bin_dir=bin_dir)
-            else:
-                self._uv_tool_install(project, requirements=None, target_dir=app_dir, bin_dir=bin_dir)
+        else:
+            self._uv_tool_install(project, requirements=None, target_dir=app_dir, bin_dir=bin_dir)
 
     # TODO similar to install_project
     def install_from_remote(self, package: Package, app_dir: Path, bin_dir: Path, locked: bool, extra_index_urls: list[str] | None = None):
-        # TODO only used if locked
-        with TemporaryDirectory() as temp_dir:
-            download_dir = temp_dir / "download"
+        if locked:
+            with TemporaryDirectory() as temp_dir:
+                download_dir = temp_dir / "download"
 
-            if locked:
                 requirements_file = temp_dir / "requirements.txt"
                 project = Project(download_and_unpack_sdist(package, download_dir, extra_index_urls))
                 project.create_requirements_from_lock_file(requirements_file)
                 self._uv_tool_install(package, requirements=requirements_file, target_dir=app_dir, bin_dir=bin_dir)
-            else:
-                self._uv_tool_install(package, requirements=None, target_dir=app_dir, bin_dir=bin_dir)
+        else:
+            self._uv_tool_install(package, requirements=None, target_dir=app_dir, bin_dir=bin_dir)
