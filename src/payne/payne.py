@@ -34,7 +34,7 @@ class Payne:
         print(f"Apps directory: {self.apps_dir}")
         print(f"Bin directory:  {self.bin_dir}")
 
-    def install_from_local(self, source_path: Path, locked: bool = False):  # TODO remove default
+    def install_project(self, source_path: Path, locked: bool = False):  # TODO remove default
         project = Project(source_path)
         app = App(self.apps_dir, project.name(), project.version())
 
@@ -45,12 +45,12 @@ class Payne:
             print(f"{app.name} {app.version} is already installed")
         else:
             print(f"Install {app.name} {app.version} from {project.root}")
-            app.install_from_local(project, self.bin_dir, locked)
+            app.install_project(project, self.bin_dir, locked)
 
         # TODO roll back if it fails (e.g., script already exists)
 
-    def install_from_remote(self, name: str, version: str, locked: bool = False,
-                            extra_index_urls: list[str] | None = None):  # TODO remove default
+    def install_package(self, name: str, version: str, locked: bool = False,
+                        extra_index_urls: list[str] | None = None):  # TODO remove default
         package = Package(name, version)
         app = App(self.apps_dir, name, version)
 
@@ -59,7 +59,7 @@ class Payne:
             print(f"{app.name} {app.version} is already installed")
         else:
             print(f"Install {app.name} {app.version}")
-            app.install_from_remote(package, self.bin_dir, locked, extra_index_urls)
+            app.install_package(package, self.bin_dir, locked, extra_index_urls)
 
     def uninstall(self, package_name: str, version: str):
         app = App(self.apps_dir, package_name, version)

@@ -84,7 +84,7 @@ class App:
             installer.install_package(package, requirements=None, target_dir=app_dir, bin_dir=bin_dir)
 
     # TODO don't we need extra index URLs here so we know where to get dependencies?
-    def install_from_local(self, project: Project, bin_dir: Path, locked: bool):
+    def install_project(self, project: Project, bin_dir: Path, locked: bool):
         with TemporaryDirectory() as temp_bin_dir:
             self._install_project(Installer(), project, self.app_dir, temp_bin_dir, locked)
 
@@ -95,7 +95,7 @@ class App:
             self.write_metadata(metadata)
 
     # TODO very similar to install_From_local
-    def install_from_remote(self, package: Package, bin_dir: Path, locked: bool, extra_index_urls: list[str] | None = None):
+    def install_package(self, package: Package, bin_dir: Path, locked: bool, extra_index_urls: list[str] | None = None):
         with TemporaryDirectory() as temp_bin_dir:
             # TODO should not be self.corresponding_package?
             self._install_package(Installer(), package, self.app_dir, temp_bin_dir, locked, extra_index_urls)
