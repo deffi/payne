@@ -4,18 +4,18 @@ import shlex
 import subprocess
 
 from payne.project import Project
-from payne.util.temp_file import TemporaryDirectory
 from payne.package import Package
 
 
 class Installer:
     """Uses uv"""
 
-    def _uv_tool_install(self, source_args: list[str], requirements: Path | None, target_dir: Path, bin_dir: Path):
-        if requirements:
-            constraints = ["--constraints", requirements]
+    @staticmethod
+    def _uv_tool_install(source_args: list[str], target_dir: Path, bin_dir: Path, *, constraints: Path | None):
+        if constraints:
+            constraints_args = ["--constraints", constraints]
         else:
-            constraints = []
+            constraints_args = []
 
         # Re-install in case it's already installed and we missed it. Should
         # have raised an exception, but uv doesn't return an error code in this
@@ -25,7 +25,7 @@ class Installer:
             "tool",
             "install",
             "--reinstall",
-            *constraints,
+            *constraints_args,
             *source_args,
         ]
 
@@ -36,8 +36,18 @@ class Installer:
         print(f"Calling uv: {shlex.join(map(str, args))}")
         return subprocess.run(args, env=env, check=True)
 
-    def install_project(self, project: Project, requirements: Path | None, target_dir: Path, bin_dir: Path):
-        self._uv_tool_install(["--from", project.root, project.name()], requirements, target_dir, bin_dir)
+    def install_project(self, project: Project, target_dir: Path, bin_dir: Path, *, constraints: Path | None):
+        self._uv_tool_install(
+            ["--from", project.root, project.name()],
+            target_dir,
+            bin_dir,
+            constraints=constraints
+        )
 
-    def install_package(self, package: Package, requirements: Path | None, target_dir: Path, bin_dir: Path):
-        self._uv_tool_install([package.requirement_specifier()], requirements, target_dir, bin_dir)
+    def install_package(self, package: Package, target_dir: Path, bin_dir: Path, *, constraints: Path | None):
+        self._uv_tool_install(
+            [package.requirement_specifier()],
+            target_dir,
+            bin_dir,
+            constraints=constraints
+        )

@@ -72,13 +72,13 @@ class App:
     def install_project(self, project: Project, bin_dir: Path, locked: bool):
         with TemporaryDirectory() as temp_dir:
             if locked:
-                requirements_file = temp_dir / "requirements.txt"
-                project.create_requirements_from_lock_file(requirements_file)
+                constraints = temp_dir / "requirements.txt"
+                project.create_requirements_from_lock_file(constraints)
             else:
-                requirements_file = None
+                constraints = None
 
             temp_bin_dir = temp_dir / "bin"
-            Installer().install_project(project, requirements=requirements_file, target_dir=self.app_dir, bin_dir=temp_bin_dir)
+            Installer().install_project(project, self.app_dir, temp_bin_dir, constraints=constraints)
             self._post_install(temp_bin_dir, bin_dir)
 
     def install_package(self, package: Package, bin_dir: Path, locked: bool, extra_index_urls: list[str] | None = None):
@@ -87,13 +87,13 @@ class App:
                 download_dir = temp_dir / "download"
                 project = Project(Downloader().download_and_unpack_sdist(package, download_dir, extra_index_urls))
 
-                requirements_file = temp_dir / "requirements.txt"
-                project.create_requirements_from_lock_file(requirements_file)
+                constraints = temp_dir / "requirements.txt"
+                project.create_requirements_from_lock_file(constraints)
             else:
-                requirements_file = None
+                constraints = None
 
             temp_bin_dir = temp_dir / "bin"
-            Installer().install_package(package, requirements=requirements_file, target_dir=self.app_dir, bin_dir=temp_bin_dir)
+            Installer().install_package(package, self.app_dir, temp_bin_dir, constraints=constraints)
             self._post_install(temp_bin_dir, bin_dir)
 
     def uninstall(self):
