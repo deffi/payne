@@ -57,6 +57,9 @@ All subprocess invocations:
     picking up local configuration)
   * Controlled PWD
 
+Wherever listing files/directories, handle if there is an unexpectred
+directory/file
+
 
 # Open questions
 

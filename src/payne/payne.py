@@ -1,3 +1,4 @@
+from collections.abc import Iterator
 from functools import cached_property
 from pathlib import Path
 import shutil
@@ -6,6 +7,7 @@ import shutil
 from payne.app import App
 from payne.project import Project
 from payne.package import Package
+from payne.util.path import is_empty
 
 
 class Payne:
@@ -30,13 +32,22 @@ class Payne:
     def uv_binary(self) -> Path:
         return Path(shutil.which("uv"))  # TODO better
 
+    def _app_dir(self, name: str, version: str) -> Path:
+        return self.apps_dir / name / version
+
+    def _installed_apps(self) -> Iterator[App]:
+        if self.apps_dir.exists():
+            for app_dir in self.apps_dir.iterdir():
+                for version_dir in app_dir.iterdir():
+                    yield App(version_dir, app_dir.name, version_dir.name)
+
     def status(self):
         print(f"Apps directory: {self.apps_dir}")
         print(f"Bin directory:  {self.bin_dir}")
 
     def install_project(self, source_path: Path, locked: bool = False):  # TODO remove default
         project = Project(source_path)
-        app = App(self.apps_dir, project.name(), project.version())
+        app = App(self._app_dir(project.name(), project.version()), project.name(), project.version())
 
         if app.is_installed():
             # TODO allow reinstall
@@ -52,7 +63,7 @@ class Payne:
     def install_package(self, name: str, version: str, locked: bool = False,
                         extra_index_urls: list[str] | None = None):  # TODO remove default
         package = Package(name, version)
-        app = App(self.apps_dir, name, version)
+        app = App(self._app_dir(name, version), name, version)
 
         if app.is_installed():
             # TODO duplication with install_from_local
@@ -61,17 +72,22 @@ class Payne:
             print(f"Install {app.name} {app.version}")
             app.install_package(package, self.bin_dir, locked, extra_index_urls)
 
-    def uninstall(self, package_name: str, version: str):
-        app = App(self.apps_dir, package_name, version)
+    def uninstall(self, name: str, version: str):
+        app = App(self._app_dir(name, version), name, version)
 
         if app.is_installed():
-            print(f"Uninstall {package_name} {version}")
+            print(f"Uninstall {name} {version}")
             app.uninstall()
+
+            # TODO factor out self.(directory that contains the app dirs for the individual versions)
+            if is_empty(self._apps_dir / app.name):
+                (self._apps_dir / app.name).rmdir()
+
         else:
-            print(f"{package_name} {version} is not installed")
+            print(f"{name} {version} is not installed")
 
     def list_(self):
-        for app in App.installed_apps(self.apps_dir):
+        for app in self._installed_apps():
             print(f"{app.name} {app.version}")
             app_metadata = app.read_metadata()
 

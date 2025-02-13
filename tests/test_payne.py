@@ -105,7 +105,8 @@ class TestPayneLocal:
             assert self.installed_apps(apps_dir) == {}
             assert self.installed_scripts(bin_dir) == set()
 
-    @pytest.mark.parametrize("source", ["remote", "remote"])
+    # FIXME should be "local", "remote"
+    @pytest.mark.parametrize("source", ["remote"])
     def test_install_locked(self, source):
         with TemporaryDirectory() as temp_dir:
             # TODO duplication
