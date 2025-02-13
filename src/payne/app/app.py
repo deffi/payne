@@ -8,7 +8,7 @@ from typing import Self
 from payne.app import AppMetadata
 from payne.download import download_and_unpack_sdist
 from payne.project import Project
-from payne import Installer
+from payne.installer import Installer
 from payne.util.path import is_empty
 from payne.util.temp_file import TemporaryDirectory
 from payne.package import Package
