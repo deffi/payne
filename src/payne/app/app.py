@@ -3,7 +3,6 @@ from functools import cached_property
 import json
 from pathlib import Path
 import shutil
-from typing import Self
 
 from payne.app import AppMetadata
 from payne.downloader import Downloader
