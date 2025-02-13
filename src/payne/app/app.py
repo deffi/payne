@@ -14,6 +14,7 @@ from payne.package import Package
 
 
 class App:
+    # TODO this should just take a root directly
     def __init__(self, apps_dir: Path, name: str, version: str):
         self._apps_dir = apps_dir
         self._name = name

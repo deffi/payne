@@ -60,7 +60,8 @@ All subprocess invocations:
 
 # Open questions
 
-Can uv have a dynamic version in `pyproject.toml`? 
+Can uv have a dynamic version in `pyproject.toml`?
+  * Can we get it by building a source package?
 
 
 # Future work
