@@ -1,5 +1,4 @@
 from collections.abc import Iterator
-from contextlib import contextmanager
 from functools import cached_property
 import json
 from pathlib import Path
@@ -62,47 +61,40 @@ class App:
                 for version_dir in app_dir.iterdir():
                     yield cls(apps_dir, app_name, version_dir.name)
 
-    def _install_project(self, installer: Installer, project: Project, app_dir: Path, bin_dir: Path, locked: bool):
-        if locked:
-            with TemporaryDirectory() as temp_dir:
-                requirements_file = temp_dir / "requirements.txt"
-                project.create_requirements_from_lock_file(requirements_file)
-                installer.install_project(project, requirements=requirements_file, target_dir=app_dir, bin_dir=bin_dir)
-        else:
-            installer.install_project(project, requirements=None, target_dir=app_dir, bin_dir=bin_dir)
+    def _post_install(self, temp_bin_dir: Path, bin_dir: Path):
+        scripts = self._install_scripts(temp_bin_dir, bin_dir)
 
-    # TODO similar to install_project
-    def _install_package(self, installer: Installer, package: Package, app_dir: Path, bin_dir: Path, locked: bool, extra_index_urls: list[str] | None = None):
-        if locked:
-            with TemporaryDirectory() as temp_dir:
-                download_dir = temp_dir / "download"
-
-                requirements_file = temp_dir / "requirements.txt"
-                project = Project(download_and_unpack_sdist(package, download_dir, extra_index_urls))
-                project.create_requirements_from_lock_file(requirements_file)
-                installer.install_package(package, requirements=requirements_file, target_dir=app_dir, bin_dir=bin_dir)
-        else:
-            installer.install_package(package, requirements=None, target_dir=app_dir, bin_dir=bin_dir)
-
-    @contextmanager
-    def _install(self, bin_dir: Path):  # TODO annotate
-        with TemporaryDirectory() as temp_bin_dir:
-            yield temp_bin_dir
-
-            scripts = self._install_scripts(temp_bin_dir, bin_dir)
-
-            metadata = AppMetadata()
-            metadata.scripts.extend(scripts)
-            self.write_metadata(metadata)
+        metadata = AppMetadata()
+        metadata.scripts.extend(scripts)
+        self.write_metadata(metadata)
 
     # TODO don't we need extra index URLs here so we know where to get dependencies?
     def install_project(self, project: Project, bin_dir: Path, locked: bool):
-        with self._install(bin_dir) as temp_bin_dir:
-            self._install_project(Installer(), project, self.app_dir, temp_bin_dir, locked)
+        with TemporaryDirectory() as temp_dir:
+            if locked:
+                requirements_file = temp_dir / "requirements.txt"
+                project.create_requirements_from_lock_file(requirements_file)
+            else:
+                requirements_file = None
+
+            temp_bin_dir = temp_dir / "bin"
+            Installer().install_project(project, requirements=requirements_file, target_dir=self.app_dir, bin_dir=temp_bin_dir)
+            self._post_install(temp_bin_dir, bin_dir)
 
     def install_package(self, package: Package, bin_dir: Path, locked: bool, extra_index_urls: list[str] | None = None):
-        with self._install(bin_dir) as temp_bin_dir:
-            self._install_package(Installer(), package, self.app_dir, temp_bin_dir, locked, extra_index_urls)
+        with TemporaryDirectory() as temp_dir:
+            if locked:
+                download_dir = temp_dir / "download"
+                project = Project(download_and_unpack_sdist(package, download_dir, extra_index_urls))
+
+                requirements_file = temp_dir / "requirements.txt"
+                project.create_requirements_from_lock_file(requirements_file)
+            else:
+                requirements_file = None
+
+            temp_bin_dir = temp_dir / "bin"
+            Installer().install_package(package, requirements=requirements_file, target_dir=self.app_dir, bin_dir=temp_bin_dir)
+            self._post_install(temp_bin_dir, bin_dir)
 
     def uninstall(self):
         metadata = self.read_metadata()
