@@ -1,9 +1,8 @@
-from pathlib import Path
 import tomllib
 
 import pytest
 
-from payne.download import download_and_unpack_sdist
+from payne.downloader import Downloader
 from payne.package import Package
 from payne.util.temp_file import TemporaryDirectory
 
@@ -19,7 +18,8 @@ class TestDownload:
     def test_download(self, package):
         with TemporaryDirectory() as temp_dir:
             # TODO factor out URL
-            target = download_and_unpack_sdist(package, temp_dir, extra_index_urls=["http://localhost:8000/payne_test_data"])
+            downloader = Downloader()
+            target = downloader.download_and_unpack_sdist(package, temp_dir, extra_index_urls=["http://localhost:8000/payne_test_data"])
 
             pyproject_toml = target / "pyproject.toml"
             assert pyproject_toml.is_file()

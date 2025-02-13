@@ -33,3 +33,4 @@ exclude = [
 markers = [
     "test_data: tests related to the test data",
 ]
+pythonpath = "tests"

@@ -6,7 +6,7 @@ import shutil
 from typing import Self
 
 from payne.app import AppMetadata
-from payne.download import download_and_unpack_sdist
+from payne.downloader import Downloader
 from payne.project import Project
 from payne.installer import Installer
 from payne.util.path import is_empty
@@ -85,7 +85,7 @@ class App:
         with TemporaryDirectory() as temp_dir:
             if locked:
                 download_dir = temp_dir / "download"
-                project = Project(download_and_unpack_sdist(package, download_dir, extra_index_urls))
+                project = Project(Downloader().download_and_unpack_sdist(package, download_dir, extra_index_urls))
 
                 requirements_file = temp_dir / "requirements.txt"
                 project.create_requirements_from_lock_file(requirements_file)
