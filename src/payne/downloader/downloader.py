@@ -6,9 +6,8 @@ from payne.package import Package
 
 
 class Downloader:
-    # TODO remove default
     @staticmethod
-    def download_and_unpack_sdist(package: Package, target: Path, extra_index_urls: list[str] | None = None) -> Path:
+    def download_and_unpack_sdist(package: Package, target: Path, extra_index_urls: list[str] | None) -> Path:
         """Downloads and unpacks a source distribution package
 
         One might assume that this functionality would be available in pip. But

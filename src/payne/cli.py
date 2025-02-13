@@ -24,9 +24,9 @@ def install(
 
     match name, version, from_:
         case n, v, None:
-            Payne().install_package(name, version, locked, extra_index_urls=extra_index_url)
+            Payne().install_package(name, version, locked=locked, extra_index_urls=extra_index_url)
         case None, None, from_:
-            Payne().install_project(from_, locked)
+            Payne().install_project(from_, locked=locked)
         case _:
             print("Either name and version or --from have to be specified")
 

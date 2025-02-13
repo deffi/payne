@@ -45,7 +45,7 @@ class Payne:
         print(f"Apps directory: {self.apps_dir}")
         print(f"Bin directory:  {self.bin_dir}")
 
-    def install_project(self, source_path: Path, locked: bool = False):  # TODO remove default
+    def install_project(self, source_path: Path, *, locked: bool):
         project = Project(source_path)
         app = App(self._app_dir(project.name(), project.version()), project.name(), project.version())
 
@@ -60,8 +60,8 @@ class Payne:
 
         # TODO roll back if it fails (e.g., script already exists)
 
-    def install_package(self, name: str, version: str, locked: bool = False,
-                        extra_index_urls: list[str] | None = None):  # TODO remove default
+    def install_package(self, name: str, version: str, *, locked: bool,
+                        extra_index_urls: list[str] | None):
         package = Package(name, version)
         app = App(self._app_dir(name, version), name, version)
 

@@ -71,7 +71,7 @@ class App:
             Installer().install_project(project, self.root, temp_bin_dir, constraints=constraints)
             self._post_install(temp_bin_dir, bin_dir)
 
-    def install_package(self, package: Package, bin_dir: Path, locked: bool, extra_index_urls: list[str] | None = None):
+    def install_package(self, package: Package, bin_dir: Path, locked: bool, extra_index_urls: list[str] | None):
         with TemporaryDirectory() as temp_dir:
             if locked:
                 download_dir = temp_dir / "download"

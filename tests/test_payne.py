@@ -43,9 +43,9 @@ class TestPayneLocal:
             def install_app(name: str, version: str):
                 match source:
                     case "local":
-                        payne.install_project(test_data / f"{name}-{version}")
+                        payne.install_project(test_data / f"{name}-{version}", locked=False)
                     case "remote":
-                        payne.install_package(name, version)
+                        payne.install_package(name, version, locked=False, extra_index_urls=[])
                     case _:
                         assert False
 
