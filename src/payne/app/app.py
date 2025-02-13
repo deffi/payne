@@ -6,6 +6,7 @@ import shutil
 from typing import Self
 
 from payne.app import AppMetadata
+from payne.download import download_and_unpack_sdist
 from payne.project import Project
 from payne import Installer
 from payne.util.path import is_empty
@@ -60,10 +61,32 @@ class App:
                 for version_dir in app_dir.iterdir():
                     yield cls(apps_dir, app_name, version_dir.name)
 
+    def _install_project(self, installer: Installer, project: Project, app_dir: Path, bin_dir: Path, locked: bool):
+        if locked:
+            with TemporaryDirectory() as temp_dir:
+                requirements_file = temp_dir / "requirements.txt"
+                project.create_requirements_from_lock_file(requirements_file)
+                installer.install_project(project, requirements=requirements_file, target_dir=app_dir, bin_dir=bin_dir)
+        else:
+            installer.install_project(project, requirements=None, target_dir=app_dir, bin_dir=bin_dir)
+
+    # TODO similar to install_project
+    def _install_package(self, installer: Installer, package: Package, app_dir: Path, bin_dir: Path, locked: bool, extra_index_urls: list[str] | None = None):
+        if locked:
+            with TemporaryDirectory() as temp_dir:
+                download_dir = temp_dir / "download"
+
+                requirements_file = temp_dir / "requirements.txt"
+                project = Project(download_and_unpack_sdist(package, download_dir, extra_index_urls))
+                project.create_requirements_from_lock_file(requirements_file)
+                installer.install_package(package, requirements=requirements_file, target_dir=app_dir, bin_dir=bin_dir)
+        else:
+            installer.install_package(package, requirements=None, target_dir=app_dir, bin_dir=bin_dir)
+
     # TODO don't we need extra index URLs here so we know where to get dependencies?
     def install_from_local(self, project: Project, bin_dir: Path, locked: bool):
         with TemporaryDirectory() as temp_bin_dir:
-            Installer().install_project(project, self.app_dir, temp_bin_dir, locked)
+            self._install_project(Installer(), project, self.app_dir, temp_bin_dir, locked)
 
             scripts = self._install_scripts(temp_bin_dir, bin_dir)
 
@@ -75,7 +98,7 @@ class App:
     def install_from_remote(self, package: Package, bin_dir: Path, locked: bool, extra_index_urls: list[str] | None = None):
         with TemporaryDirectory() as temp_bin_dir:
             # TODO should not be self.corresponding_package?
-            Installer().install_from_remote(package, self.app_dir, temp_bin_dir, locked, extra_index_urls)
+            self._install_package(Installer(), package, self.app_dir, temp_bin_dir, locked, extra_index_urls)
 
             scripts = self._install_scripts(temp_bin_dir, bin_dir)
 
