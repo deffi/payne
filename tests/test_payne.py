@@ -53,8 +53,6 @@ class TestPayneLocal:
             bin_dir = temp_dir / "bin"
 
             payne = Payne(apps_dir, bin_dir, {"payne_test_data": "http://localhost:8000/payne_test_data"})
-            # # TODO this variable should be independent of uv
-            # os.environ["UV_INDEX"] = "payne_test_data=http://localhost:8000/payne_test_data"
 
             # Install foo 1.3.0
             install_app("foo", "1.3.0")
@@ -121,9 +119,8 @@ class TestPayneLocal:
             apps_dir = temp_dir / "apps"
             bin_dir = temp_dir / "bin"
 
+            # TODO duplication of indices
             payne = Payne(apps_dir, bin_dir, {"payne_test_data": "http://localhost:8000/payne_test_data"})
-            # TODO this variable should be independent of uv, TODO duplication
-            #os.environ["UV_INDEX"] = "payne_test_data=http://localhost:8000/payne_test_data"
 
             # Install foo 1.3.0
             install_app("foo", "1.3.0")
