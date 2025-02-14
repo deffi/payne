@@ -19,7 +19,7 @@ class TestDownload:
         with TemporaryDirectory() as temp_dir:
             # TODO factor out URL
             downloader = Downloader()
-            target = downloader.download_and_unpack_sdist(package, temp_dir, extra_index_urls=["http://localhost:8000/payne_test_data"])
+            target = downloader.download_and_unpack_sdist(package, temp_dir, package_indices={"payne_test_data": "http://localhost:8000/payne_test_data"})
 
             pyproject_toml = target / "pyproject.toml"
             assert pyproject_toml.is_file()

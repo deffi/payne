@@ -58,7 +58,7 @@ class App:
         self.write_metadata(metadata)
 
     # TODO don't we need extra index URLs here so we know where to get dependencies?
-    def install_project(self, project: Project, bin_dir: Path, locked: bool):
+    def install_project(self, project: Project, bin_dir: Path, locked: bool, package_indices: dict[str, str]):
         with TemporaryDirectory() as temp_dir:
             if locked:
                 constraints = temp_dir / "requirements.txt"
@@ -67,14 +67,14 @@ class App:
                 constraints = None
 
             temp_bin_dir = temp_dir / "bin"
-            Installer().install_project(project, self.root, temp_bin_dir, constraints=constraints)
+            Installer().install_project(project, self.root, temp_bin_dir, constraints=constraints, package_indices=package_indices)
             self._post_install(temp_bin_dir, bin_dir)
 
-    def install_package(self, package: Package, bin_dir: Path, locked: bool, extra_index_urls: list[str] | None):
+    def install_package(self, package: Package, bin_dir: Path, locked: bool, package_indices: dict[str, str]):
         with TemporaryDirectory() as temp_dir:
             if locked:
                 download_dir = temp_dir / "download"
-                project = Project(Downloader().download_and_unpack_sdist(package, download_dir, extra_index_urls))
+                project = Project(Downloader().download_and_unpack_sdist(package, download_dir, package_indices))
 
                 constraints = temp_dir / "requirements.txt"
                 project.create_requirements_from_lock_file(constraints)
@@ -82,7 +82,7 @@ class App:
                 constraints = None
 
             temp_bin_dir = temp_dir / "bin"
-            Installer().install_package(package, self.root, temp_bin_dir, constraints=constraints)
+            Installer().install_package(package, self.root, temp_bin_dir, constraints=constraints, package_indices=package_indices)
             self._post_install(temp_bin_dir, bin_dir)
 
     def uninstall(self):

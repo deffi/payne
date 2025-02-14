@@ -16,9 +16,11 @@ class Payne:
             self,
             apps_dir: Path = Path.home() / ".local" / "share" / "payne" / "apps",  # TODO better
             bin_dir: Path = Path.home() / ".local" / "bin",  # TODO better
+            package_indices: dict[str, str] = None,  # TODO remove default
             ):
         self._apps_dir = apps_dir
         self._bin_dir = bin_dir
+        self._package_indices = package_indices or {}
 
     @cached_property
     def apps_dir(self):
@@ -56,12 +58,11 @@ class Payne:
             print(f"{app.name} {app.version} is already installed")
         else:
             print(f"Install {app.name} {app.version} from {project.root}")
-            app.install_project(project, self.bin_dir, locked)
+            app.install_project(project, self.bin_dir, locked, self._package_indices)
 
         # TODO roll back if it fails (e.g., script already exists)
 
-    def install_package(self, name: str, version: str, *, locked: bool,
-                        extra_index_urls: list[str] | None):
+    def install_package(self, name: str, version: str, *, locked: bool):
         package = Package(name, version)
         app = App(self._app_dir(name, version), name, version)
 
@@ -70,7 +71,7 @@ class Payne:
             print(f"{app.name} {app.version} is already installed")
         else:
             print(f"Install {app.name} {app.version}")
-            app.install_package(package, self.bin_dir, locked, extra_index_urls)
+            app.install_package(package, self.bin_dir, locked, self._package_indices)
 
     def uninstall(self, name: str, version: str):
         app = App(self._app_dir(name, version), name, version)

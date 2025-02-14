@@ -45,16 +45,16 @@ class TestPayneLocal:
                     case "local":
                         payne.install_project(test_data / f"{name}-{version}", locked=False)
                     case "remote":
-                        payne.install_package(name, version, locked=False, extra_index_urls=[])
+                        payne.install_package(name, version, locked=False)
                     case _:
                         assert False
 
             apps_dir = temp_dir / "apps"
             bin_dir = temp_dir / "bin"
 
-            payne = Payne(apps_dir, bin_dir)
-            # TODO this variable should be independent of uv
-            os.environ["UV_INDEX"] = "payne_test_data=http://localhost:8000/payne_test_data"
+            payne = Payne(apps_dir, bin_dir, {"payne_test_data": "http://localhost:8000/payne_test_data"})
+            # # TODO this variable should be independent of uv
+            # os.environ["UV_INDEX"] = "payne_test_data=http://localhost:8000/payne_test_data"
 
             # Install foo 1.3.0
             install_app("foo", "1.3.0")
@@ -114,16 +114,16 @@ class TestPayneLocal:
                     case "local":
                         payne.install_project(test_data / f"{name}-{version}", locked=True)
                     case "remote":
-                        payne.install_package(name, version, locked=True, extra_index_urls=["http://localhost:8000/payne_test_data"])
+                        payne.install_package(name, version, locked=True)
                     case _:
                         assert False
 
             apps_dir = temp_dir / "apps"
             bin_dir = temp_dir / "bin"
 
-            payne = Payne(apps_dir, bin_dir)
+            payne = Payne(apps_dir, bin_dir, {"payne_test_data": "http://localhost:8000/payne_test_data"})
             # TODO this variable should be independent of uv, TODO duplication
-            os.environ["UV_INDEX"] = "payne_test_data=http://localhost:8000/payne_test_data"
+            #os.environ["UV_INDEX"] = "payne_test_data=http://localhost:8000/payne_test_data"
 
             # Install foo 1.3.0
             install_app("foo", "1.3.0")

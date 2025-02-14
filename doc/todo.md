@@ -1,17 +1,28 @@
 # Basic functionality
 
-Clarify configuration of extra package indices:
-  * Individual tool (uv and unearth so far)?
-    * We'll probably have this configured anyway
-    * Does unearth allow configuring this?
-  * Payne configuration that's passed on?
-    * Need multiple
-    * Need name:url
+Extra package indices:
+  * We're using different tools, sometimes in the same invocation
+    * uv tool
+    * build library
+    * unearth library
+    * pip tool
+  * These tools are configured in different ways
+  * We want them to behave consistently
+  * So we use our own configuration and pass it on to the tools on invocation,
+    overriding any configuration that may come from the environment or
+    configuration files
+  * We need the name of the index if we have packages that are pinned to an
+    index 
+    * uv tool install --from .
+    * uv export
+
+Test installing from local index with dependency from PyPI
 
 Identify paths:
   * Apps directory: ~/.local/share/payne/apps
   * bin directory: ~/.local/bin
 
+When testing, clear the environment?
 
 
 # Desired functionality
@@ -104,3 +115,5 @@ Uninstall a non-installed app
 CLI tests (mock class Payne)
 
 End-to-end tests
+
+Install cowsay

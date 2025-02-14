@@ -20,13 +20,15 @@ def install(
         /, *,
         from_: Path | None = None,
         locked: bool = True,
-        extra_index_url: list[str] | None = None):
+        index: list[str] | None = None):  # TODO indices alias index?
+
+    package_indices = dict(i.split("=", 1) for i in index)
 
     match name, version, from_:
         case n, v, None:
-            Payne().install_package(n, v, locked=locked, extra_index_urls=extra_index_url)
+            Payne(package_indices=package_indices).install_package(n, v, locked=locked)
         case None, None, f:
-            Payne().install_project(f, locked=locked)
+            Payne(package_indices=package_indices).install_project(f, locked=locked)
         case _:
             print("Either name and version or --from have to be specified")
 

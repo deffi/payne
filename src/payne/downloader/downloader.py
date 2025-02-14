@@ -7,7 +7,7 @@ from payne.package import Package
 
 class Downloader:
     @staticmethod
-    def download_and_unpack_sdist(package: Package, target: Path, extra_index_urls: list[str] | None) -> Path:
+    def download_and_unpack_sdist(package: Package, target: Path, package_indices: dict[str, str]) -> Path:
         """Downloads and unpacks a source distribution package
 
         One might assume that this functionality would be available in pip. But
@@ -22,9 +22,8 @@ class Downloader:
 
         finder = PackageFinder(no_binary=[package.name])
 
-        if extra_index_urls:
-            for url in extra_index_urls:
-                finder.add_index_url(url)
+        for url in package_indices.values():
+            finder.add_index_url(url)
 
         # TODO handle not found
         result = finder.find_best_match(package.requirement_specifier())
