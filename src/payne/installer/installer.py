@@ -12,7 +12,7 @@ class Installer:
 
     @staticmethod
     def _uv_tool_install(source_args: list[str], target_dir: Path, bin_dir: Path, *, constraints: Path | None, package_indices: dict[str, str]):
-        if constraints:
+        if constraints and constraints.read_text().strip():
             constraints_args = ["--constraints", constraints]
         else:
             constraints_args = []
