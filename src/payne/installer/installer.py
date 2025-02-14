@@ -41,6 +41,8 @@ class Installer:
         # Avoid picking up local configuration
         env["UV_INDEX"] = ""
         env["UV_EXTRA_INDEX_URL"] = ""
+        # Avoid warning about (temporary) bin dir not being on PATH
+        env["PATH"] = os.pathsep.join([env["PATH"], str(bin_dir)])
 
         print(f"Calling uv: {shlex.join(map(str, args))}")
         return subprocess.run(args, env=env, check=True)
