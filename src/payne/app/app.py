@@ -57,7 +57,6 @@ class App:
         metadata.scripts.extend(scripts)
         self.write_metadata(metadata)
 
-    # TODO don't we need extra index URLs here so we know where to get dependencies?
     def install_project(self, project: Project, bin_dir: Path, locked: bool, package_indices: dict[str, str]):
         with TemporaryDirectory() as temp_dir:
             if locked:
