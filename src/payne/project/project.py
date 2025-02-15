@@ -12,7 +12,7 @@ import uv
 
 from payne.project import Pyproject
 from payne.project.build_frontend import Frontend
-from payne.util.temp_file import TemporaryDirectory
+from payne.util.file_system import TemporaryDirectory
 
 
 class Project:

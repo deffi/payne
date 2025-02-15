@@ -6,7 +6,7 @@ import shutil
 
 from payne.app import AppMetadata
 from payne.installer import Installer, InstallSource
-from payne.util.temp_file import TemporaryDirectory
+from payne.util.file_system import TemporaryDirectory, safe_create
 
 
 class App:
@@ -48,15 +48,16 @@ class App:
         return self.root.exists()
 
     def install(self, installer: Installer, source: InstallSource, bin_dir: Path, constraints_file: Path):
-        with TemporaryDirectory() as temp_dir:
-            temp_bin_dir = temp_dir / "bin"
-            installer.install(source, self.root, temp_bin_dir, constraints=constraints_file)
+        with safe_create(self.root) as root:
+            with TemporaryDirectory() as temp_dir:
+                temp_bin_dir = temp_dir / "bin"
+                installer.install(source, root, temp_bin_dir, constraints=constraints_file)
 
-            scripts = self._install_scripts(temp_bin_dir, bin_dir)
+                scripts = self._install_scripts(temp_bin_dir, bin_dir)
 
-            metadata = AppMetadata()
-            metadata.scripts.extend(scripts)
-            self.write_metadata(metadata)
+                metadata = AppMetadata()
+                metadata.scripts.extend(scripts)
+                self.write_metadata(metadata)
 
     def uninstall(self):
         metadata = self.read_metadata()

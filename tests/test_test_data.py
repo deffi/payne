@@ -4,7 +4,7 @@ import subprocess
 import pytest
 
 import payne
-from payne.util.temp_file import TemporaryDirectory
+from payne.util.file_system import TemporaryDirectory
 
 # Need this to be in scope so it can be autoused
 # noinspection PyUnresolvedReferences

@@ -2,7 +2,7 @@ import os
 from pathlib import Path
 
 from payne import Payne
-from payne.util.temp_file import TemporaryDirectory
+from payne.util.file_system import TemporaryDirectory
 
 import pytest
 

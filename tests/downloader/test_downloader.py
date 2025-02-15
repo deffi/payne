@@ -4,7 +4,7 @@ import pytest
 
 from payne.downloader import Downloader
 from payne.package import Package
-from payne.util.temp_file import TemporaryDirectory
+from payne.util.file_system import TemporaryDirectory
 
 # noinspection PyUnresolvedReferences
 from fixtures.index_server import index_server
