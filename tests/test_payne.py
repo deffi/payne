@@ -43,9 +43,9 @@ class TestPayneLocal:
             def install_app(name: str, version: str):
                 match source:
                     case "local":
-                        payne.install_project(test_data / f"{name}-{version}", locked=False)
+                        payne.install_project(test_data / f"{name}-{version}", locked=False, reinstall=False)
                     case "remote":
-                        payne.install_package(name, version, locked=False)
+                        payne.install_package(name, version, locked=False, reinstall=False)
                     case _:
                         assert False
 
@@ -110,9 +110,9 @@ class TestPayneLocal:
             def install_app(name: str, version: str):
                 match source:
                     case "local":
-                        payne.install_project(test_data / f"{name}-{version}", locked=True)
+                        payne.install_project(test_data / f"{name}-{version}", locked=True, reinstall=False)
                     case "remote":
-                        payne.install_package(name, version, locked=True)
+                        payne.install_package(name, version, locked=True, reinstall=False)
                     case _:
                         assert False
 
@@ -163,7 +163,7 @@ class TestPayneLocal:
             payne = Payne(apps_dir, bin_dir, {"payne_test_data": "http://localhost:8000/payne_test_data"})
 
             # Install sup 2.1.0
-            payne.install_project(test_data / "sup-2.1.0", locked=locked)
+            payne.install_project(test_data / "sup-2.1.0", locked=locked, reinstall=False)
             assert self.installed_apps(apps_dir) == {"sup": {"2.1.0"}}
             assert self.installed_scripts(bin_dir) == {"sup-2.1.0"}
             self.assert_app_valid(apps_dir, "sup", "2.1.0")
