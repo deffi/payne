@@ -13,6 +13,9 @@ InstallSource = Project | Package
 class Installer:
     """Uses uv"""
 
+    def __init__(self, package_indices: dict[str, str]):
+        self._package_indices = package_indices
+
     @staticmethod
     def _uv_tool_install(source_args: list[str], target_dir: Path, bin_dir: Path, *, constraints: Path | None, package_indices: dict[str, str]):
         if constraints and constraints.exists() and constraints.read_text().strip():
@@ -50,29 +53,29 @@ class Installer:
         print(f"Calling uv: {shlex.join(map(str, args))}")
         return subprocess.run(args, env=env, check=True)
 
-    def install_project(self, project: Project, target_dir: Path, bin_dir: Path, *, constraints: Path | None, package_indices: dict[str, str]):
+    def install_project(self, project: Project, target_dir: Path, bin_dir: Path, *, constraints: Path | None):
         self._uv_tool_install(
             ["--from", project.root, project.name()],
             target_dir,
             bin_dir,
             constraints=constraints,
-            package_indices=package_indices,
+            package_indices=self._package_indices,
         )
 
-    def install_package(self, package: Package, target_dir: Path, bin_dir: Path, *, constraints: Path | None, package_indices: dict[str, str]):
+    def install_package(self, package: Package, target_dir: Path, bin_dir: Path, *, constraints: Path | None):
         self._uv_tool_install(
             [package.requirement_specifier()],
             target_dir,
             bin_dir,
             constraints=constraints,
-            package_indices=package_indices,
+            package_indices=self._package_indices,
         )
 
-    def install(self, source: InstallSource, target_dir: Path, bin_dir: Path, *, constraints: Path | None, package_indices: dict[str, str]):
+    def install(self, source: InstallSource, target_dir: Path, bin_dir: Path, *, constraints: Path | None):
         match source:
             case Project():
-                self.install_project(source, target_dir, bin_dir, constraints=constraints, package_indices=package_indices)
+                self.install_project(source, target_dir, bin_dir, constraints=constraints)
             case Package():
-                self.install_package(source, target_dir, bin_dir, constraints=constraints, package_indices=package_indices)
+                self.install_package(source, target_dir, bin_dir, constraints=constraints)
             case _:
                 raise TypeError(f"Unknown installation source: {source}")
