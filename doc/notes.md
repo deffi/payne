@@ -265,6 +265,28 @@ In case of a conflict, we might allow the user to replace or modify the name. In
 this case, we'll need to store the mapping in the metadata. 
 
 
+# Extra package indices
+
+We're using different tools, sometimes in the same invocation, and we want them
+to behave consistently:
+  * uv
+  * pip
+  * build (library)
+  * unearth (library)
+
+All of these tools need to be aware of the package indices, and they are
+configured in different ways. 
+
+Therefore, we use our own configuration and pass it on to the tools on
+invocation. For consistency, we override any configuration that may come from
+the environment or from configuration files of the individual tools.
+ 
+We also need to configure the name of each index if we have packages that are
+pinned to an index in `pyproject.toml`:
+  * uv tool install --from .
+  * uv export
+
+
 # Summary
 
 We need to actually install the locked versions
@@ -289,6 +311,11 @@ Conflicts can occur
   * Between script-version names
     * Use script~version instead
   * Between scripts of different packages
+
+Extra package indices
+  * Own configuration
+  * With package-index names
+  * Overrides tool-specific configuration
 
 
 # Decision

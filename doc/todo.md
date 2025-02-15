@@ -11,21 +11,6 @@ Installing:
       * Build the sdist (partly?) to get the metadata
   * Install (from the original source)
 
-Extra package indices:
-  * We're using different tools, sometimes in the same invocation
-    * uv tool
-    * build library
-    * unearth library
-    * pip tool
-  * These tools are configured in different ways
-  * We want them to behave consistently
-  * So we use our own configuration and pass it on to the tools on invocation,
-    overriding any configuration that may come from the environment or
-    configuration files
-  * We need the name of the index if we have packages that are pinned to an
-    index 
-    * uv tool install --from .
-    * uv export
 
 Test installing from local index with dependency from PyPI
 
@@ -79,8 +64,10 @@ Allow uninstalling all versions of a specific tool
 
 # Error handling
 
-If the testdata server isn't running, installing foo fails, but it will still
-look like it is installed because the directory exists
+App (not app-version) directory isn't always remove when installation fails,
+e.g. 
+    uv run payne install --index payne_test_data=http://localhost:8000/payne_test_data foo 1.3.0 --no-locked
+While the server isn't running. Looks like it tries, but somthing still has the file open.
 
 
 # Robustness
