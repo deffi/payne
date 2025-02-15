@@ -1,1 +1,1 @@
-from .installer import Installer
+from .installer import Installer, InstallSource

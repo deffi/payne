@@ -5,10 +5,8 @@ from pathlib import Path
 import shutil
 
 from payne.app import AppMetadata
-from payne.project import Project
-from payne.installer import Installer
+from payne.installer import Installer, InstallSource
 from payne.util.temp_file import TemporaryDirectory
-from payne.package import Package
 
 
 class App:
@@ -49,24 +47,16 @@ class App:
     def is_installed(self) -> bool:
         return self.root.exists()
 
-    def _post_install(self, temp_bin_dir: Path, bin_dir: Path):
-        scripts = self._install_scripts(temp_bin_dir, bin_dir)
-
-        metadata = AppMetadata()
-        metadata.scripts.extend(scripts)
-        self.write_metadata(metadata)
-
-    def install_project(self, project: Project, bin_dir: Path, constraints_file: Path, package_indices: dict[str, str]):
+    def install(self, source: InstallSource, bin_dir: Path, constraints_file: Path, package_indices: dict[str, str]):
         with TemporaryDirectory() as temp_dir:
             temp_bin_dir = temp_dir / "bin"
-            Installer().install_project(project, self.root, temp_bin_dir, constraints=constraints_file, package_indices=package_indices)
-            self._post_install(temp_bin_dir, bin_dir)
+            Installer().install(source, self.root, temp_bin_dir, constraints=constraints_file, package_indices=package_indices)
 
-    def install_package(self, package: Package, bin_dir: Path, constraints_file: Path, package_indices: dict[str, str]):
-        with TemporaryDirectory() as temp_dir:
-            temp_bin_dir = temp_dir / "bin"
-            Installer().install_package(package, self.root, temp_bin_dir, constraints=constraints_file, package_indices=package_indices)
-            self._post_install(temp_bin_dir, bin_dir)
+            scripts = self._install_scripts(temp_bin_dir, bin_dir)
+
+            metadata = AppMetadata()
+            metadata.scripts.extend(scripts)
+            self.write_metadata(metadata)
 
     def uninstall(self):
         metadata = self.read_metadata()

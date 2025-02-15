@@ -85,7 +85,7 @@ class Payne:
                     project.create_requirements_from_lock_file(constraints_file)
 
                 print(f"Install {app.name} {app.version} from {project.root}")
-                app.install_project(project, self.bin_dir, constraints_file, self._package_indices)
+                app.install(project, self.bin_dir, constraints_file, self._package_indices)
                 # TODO roll back if it fails (e.g., script already exists)
 
     def install_package(self, name: str, version: str, *, locked: bool):
@@ -105,7 +105,7 @@ class Payne:
                     project.create_requirements_from_lock_file(constraints_file)
 
                 print(f"Install {app.name} {app.version}")
-                app.install_package(package, self.bin_dir, constraints_file, self._package_indices)
+                app.install(package, self.bin_dir, constraints_file, self._package_indices)
 
     def uninstall(self, name: str, version: str):
         app = App(self._app_dir(name, version), name, version)

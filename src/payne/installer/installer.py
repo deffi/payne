@@ -7,6 +7,9 @@ from payne.project import Project
 from payne.package import Package
 
 
+InstallSource = Project | Package
+
+
 class Installer:
     """Uses uv"""
 
@@ -64,3 +67,12 @@ class Installer:
             constraints=constraints,
             package_indices=package_indices,
         )
+
+    def install(self, source: InstallSource, target_dir: Path, bin_dir: Path, *, constraints: Path | None, package_indices: dict[str, str]):
+        match source:
+            case Project():
+                self.install_project(source, target_dir, bin_dir, constraints=constraints, package_indices=package_indices)
+            case Package():
+                self.install_package(source, target_dir, bin_dir, constraints=constraints, package_indices=package_indices)
+            case _:
+                raise TypeError(f"Unknown installation source: {source}")
