@@ -152,3 +152,20 @@ class TestPayneLocal:
             #     "This is foo 1.3.1\nThis is bar 1.2.0\nThis is baz 1.1.0\n", "")
             # assert process_output([bin_dir / "foo-1.3.2"]) == (
             #     "This is foo 1.3.2\nThis is bar 1.2.0\nThis is baz 1.1.0\n", "")
+
+    @pytest.mark.parametrize("locked", [False, True])
+    def test_install_local(self, locked):
+        with TemporaryDirectory() as temp_dir:
+            apps_dir = temp_dir / "apps"
+            bin_dir = temp_dir / "bin"
+
+            payne = Payne(apps_dir, bin_dir, {"payne_test_data": "http://localhost:8000/payne_test_data"})
+
+            # Install foo 1.3.0
+            payne.install_project(test_data / "sup-2.1.0", locked=locked)
+            assert self.installed_apps(apps_dir) == {"sup": {"2.1.0"}}
+            assert self.installed_scripts(bin_dir) == {"sup-2.1.0"}
+            self.assert_app_valid(apps_dir, "sup", "2.1.0")
+
+            assert process_output([bin_dir / "sup-2.1.0"]) == (
+                "This is sup 2.1.0\n", "")
