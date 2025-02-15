@@ -29,5 +29,5 @@ See `doc/testing.md` for details.
 ## Etymology
 
 This should have been called "Pain", for **P**ython **a**pplication
-**in**staller, but that name was already taken on PyPI. "Payne" is considered
-close enough.
+**in**staller (and because installing Python applications is a pain), but that
+name was already taken on PyPI. "Payne" is considered close enough.
