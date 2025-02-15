@@ -3,7 +3,7 @@ from contextlib import contextmanager, suppress
 
 from pathlib import Path
 
-from payne.app import App
+from payne.app import AppVersion
 from payne.util.path import is_empty
 
 
@@ -15,11 +15,11 @@ class AppsDir:
     def root(self) -> Path:
         return self._root
 
-    def installed_apps(self) -> Iterator[App]:
+    def installed_apps(self) -> Iterator[AppVersion]:
         if self.root.exists():
             for app_dir in self.root.iterdir():
                 for app_version_dir in app_dir.iterdir():
-                    yield App(app_version_dir, app_dir.name, app_version_dir.name)
+                    yield AppVersion(app_version_dir, app_dir.name, app_version_dir.name)
 
     def app_dir(self, name: str) -> Path:
         return self.root / name

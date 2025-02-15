@@ -1,11 +1,11 @@
 from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
-    from payne.app import App
+    from payne.app import AppVersion
 
 
 class AppVersionAlreadyInstalled(Exception):
-    def __init__(self, app: "App"):
+    def __init__(self, app: "AppVersion"):
         self.app = app
 
     def __str__(self):

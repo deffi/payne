@@ -1,3 +1,3 @@
-from .app_metadata import AppMetadata
-from .app import App
+from .app_version_metadata import AppVersionMetadata
+from .app_version import AppVersion
 from .apps_dir import AppsDir

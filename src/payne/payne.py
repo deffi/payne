@@ -3,7 +3,7 @@ from pathlib import Path
 import shutil
 
 
-from payne.app import App, AppsDir
+from payne.app import AppVersion, AppsDir
 from payne.downloader import Downloader
 from payne.exceptions import AppVersionAlreadyInstalled
 from payne.installer import UvInstaller
@@ -55,14 +55,14 @@ class Payne:
                 case _:
                     raise TypeError(f"Unhandled source: {source}")
 
-            # Check whether the ap is already installed so we avoid extra work
-            # if we decide to stop
-            app = App(self.apps_dir.app_version_dir(name, version), name, version)
-            if app.is_installed():
+            # Check whether the app version is already installed so we avoid
+            # extra work if we decide to stop
+            app_version = AppVersion(self.apps_dir.app_version_dir(name, version), name, version)
+            if app_version.is_installed():
                 if reinstall:
-                    app.uninstall()
+                    app_version.uninstall()
                 else:
-                    raise AppVersionAlreadyInstalled(app)
+                    raise AppVersionAlreadyInstalled(app_version)
 
             # For a locked install, we have to determine the constraints
             constraints_file = temp_dir / "constraints.txt"
@@ -85,16 +85,16 @@ class Payne:
             # We're now ready to install the app
             match source:
                 case Project() as project:
-                    print(f"Install {app.name} {app.version} from {project.root}")
+                    print(f"Install {app_version.name} {app_version.version} from {project.root}")
                 case Package():
-                    print(f"Install {app.name} {app.version}")
+                    print(f"Install {app_version.name} {app_version.version}")
                 case _:
                     raise TypeError(f"Unhandled source: {source}")
 
             installer = UvInstaller(self._package_indices)
 
-            with self.apps_dir.cleanup_app_dir(app.name):
-                app.install(installer, source, self.bin_dir, constraints_file)
+            with self.apps_dir.cleanup_app_dir(app_version.name):
+                app_version.install(installer, source, self.bin_dir, constraints_file)
 
     def install_project(self, root: Path, *, locked: bool, reinstall: bool):
         self.install(Project(root), locked=locked, reinstall=reinstall)
@@ -103,13 +103,13 @@ class Payne:
         self.install(Package(name, version), locked=locked, reinstall=reinstall)
 
     def uninstall(self, name: str, version: str):
-        app = App(self.apps_dir.app_version_dir(name, version), name, version)
+        app_version = AppVersion(self.apps_dir.app_version_dir(name, version), name, version)
 
-        if app.is_installed():
+        if app_version.is_installed():
             print(f"Uninstall {name} {version}")
 
             with self.apps_dir.cleanup_app_dir(name):
-                app.uninstall()
+                app_version.uninstall()
 
         else:
             print(f"{name} {version} is not installed")

@@ -15,11 +15,11 @@ from utils import child_names, process_output
 class TestPayneLocal:
     @staticmethod
     def assert_app_valid(apps_dir: Path, name: str, version: str):
-        assert (apps_dir / name)                                .is_dir()   # app group dir
-        assert (apps_dir / name / version)                      .is_dir()   # app dir
-        assert (apps_dir / name / version / "payne_app.json")   .is_file()  # metadata
-        assert (apps_dir / name / version / name)               .is_dir()   # venv
-        assert (apps_dir / name / version / name / "pyvenv.cfg").is_file()  # venv metadata
+        assert (apps_dir / name)                                     .is_dir()   # app group dir
+        assert (apps_dir / name / version)                           .is_dir()   # app dir
+        assert (apps_dir / name / version / "payne_app-version.json").is_file()  # metadata
+        assert (apps_dir / name / version / name)                    .is_dir()   # venv
+        assert (apps_dir / name / version / name / "pyvenv.cfg")     .is_file()  # venv metadata
 
     @staticmethod
     def installed_apps(app_dir: Path) -> dict[str, set[str]]:

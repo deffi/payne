@@ -1,7 +1,7 @@
 from pathlib import Path
 
 
-class AppMetadata:
+class AppVersionMetadata:
     def __init__(self):
         self.scripts: list[Path] = []
 
@@ -15,4 +15,3 @@ class AppMetadata:
         result = cls()
         result.scripts = [Path(script) for script in metadata["scripts"]]
         return result
-

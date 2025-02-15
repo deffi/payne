@@ -4,12 +4,12 @@ import json
 from pathlib import Path
 import shutil
 
-from payne.app import AppMetadata
+from payne.app import AppVersionMetadata
 from payne.installer import Installer, InstallSource
 from payne.util.file_system import TemporaryDirectory, safe_create
 
 
-class App:
+class AppVersion:
     def __init__(self, root: Path, name: str, version: str):
         self._root = root
         self._name = name
@@ -55,7 +55,7 @@ class App:
 
                 scripts = self._install_scripts(temp_bin_dir, bin_dir)
 
-                metadata = AppMetadata()
+                metadata = AppVersionMetadata()
                 metadata.scripts.extend(scripts)
                 self.write_metadata(metadata)
 
@@ -80,12 +80,11 @@ class App:
 
     @cached_property
     def metadata_file(self) -> Path:
-        return self.root / "payne_app.json"
+        return self.root / "payne_app-version.json"
 
-    def write_metadata(self, metadata: AppMetadata):
+    def write_metadata(self, metadata: AppVersionMetadata):
         self.metadata_file.write_text(json.dumps(metadata.dump()))
 
-    def read_metadata(self) -> AppMetadata:
-        metadata_file = self.root / "payne_app.json"
-        data = json.loads(metadata_file.read_text())
-        return AppMetadata.parse(data)
+    def read_metadata(self) -> AppVersionMetadata:
+        data = json.loads(self.metadata_file.read_text())
+        return AppVersionMetadata.parse(data)

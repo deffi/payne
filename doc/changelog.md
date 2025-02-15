@@ -1,4 +1,5 @@
 ...:
+  * Metadata file renamed from `payne_app.json` to `payne_app-version.json`
 
 0.2.0:
   * Installing applications from PyPI

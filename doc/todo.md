@@ -41,9 +41,6 @@ be read)
 Don't re-use UV_* environment variables, use PAYNE_* or command line arguments
 instead
 
-What is currently called "app" should be "app version", and then we can use
-"app" for the unit of all installed versions of an app.
-
 Allow overriding name and version for projects; don't read metadata (or build
 the project) if name and version are overridden.
 
