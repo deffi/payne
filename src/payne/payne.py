@@ -1,17 +1,15 @@
-from collections.abc import Iterator
 from functools import cached_property
 from pathlib import Path
 import shutil
 
 
-from payne.app import App
+from payne.app import App, AppsDir
 from payne.downloader import Downloader
 from payne.exceptions import AppVersionAlreadyInstalled
 from payne.installer import UvInstaller
 from payne.project import Project
 from payne.package import Package
-from payne.util.path import is_empty
-from payne.util.file_system import TemporaryDirectory, safe_ensure_exists
+from payne.util.file_system import TemporaryDirectory
 
 
 class Payne:
@@ -22,12 +20,12 @@ class Payne:
             bin_dir: Path = Path.home() / ".local" / "bin",  # TODO better
             package_indices: dict[str, str] = None,  # TODO remove default
             ):
-        self._apps_dir = apps_dir
+        self._apps_dir = AppsDir(apps_dir)
         self._bin_dir = bin_dir
         self._package_indices = package_indices or {}
 
-    @cached_property
-    def apps_dir(self):
+    @property
+    def apps_dir(self) -> AppsDir:
         return self._apps_dir
 
     @cached_property
@@ -38,17 +36,8 @@ class Payne:
     def uv_binary(self) -> Path:
         return Path(shutil.which("uv"))  # TODO better
 
-    def _app_dir(self, name: str, version: str) -> Path:
-        return self.apps_dir / name / version
-
-    def _installed_apps(self) -> Iterator[App]:
-        if self.apps_dir.exists():
-            for app_dir in self.apps_dir.iterdir():
-                for version_dir in app_dir.iterdir():
-                    yield App(version_dir, app_dir.name, version_dir.name)
-
     def status(self):
-        print(f"Apps directory: {self.apps_dir}")
+        print(f"Apps directory: {self.apps_dir.root}")
         print(f"Bin directory:  {self.bin_dir}")
 
     def install(self, source: Project | Package, *, locked: bool, reinstall: bool):
@@ -68,7 +57,7 @@ class Payne:
 
             # Check whether the ap is already installed so we avoid extra work
             # if we decide to stop
-            app = App(self._app_dir(name, version), name, version)
+            app = App(self.apps_dir.app_version_dir(name, version), name, version)
             if app.is_installed():
                 if reinstall:
                     app.uninstall()
@@ -103,8 +92,7 @@ class Payne:
 
             installer = UvInstaller(self._package_indices)
 
-            # TODO factor out self.(directory that contains the app dirs for the individual versions)
-            with safe_ensure_exists(self._apps_dir / app.name):
+            with self.apps_dir.cleanup_app_dir(app.name):
                 app.install(installer, source, self.bin_dir, constraints_file)
 
     def install_project(self, root: Path, *, locked: bool, reinstall: bool):
@@ -115,21 +103,19 @@ class Payne:
         self.install(Package(name, version), locked=locked, reinstall=reinstall)
 
     def uninstall(self, name: str, version: str):
-        app = App(self._app_dir(name, version), name, version)
+        app = App(self.apps_dir.app_version_dir(name, version), name, version)
 
         if app.is_installed():
             print(f"Uninstall {name} {version}")
-            app.uninstall()
 
-            # TODO factor out self.(directory that contains the app dirs for the individual versions)
-            if is_empty(self._apps_dir / app.name):
-                (self._apps_dir / app.name).rmdir()
+            with self.apps_dir.cleanup_app_dir(name):
+                app.uninstall()
 
         else:
             print(f"{name} {version} is not installed")
 
     def list_(self):
-        for app in self._installed_apps():
+        for app in self.apps_dir.installed_apps():
             print(f"{app.name} {app.version}")
             app_metadata = app.read_metadata()
 
