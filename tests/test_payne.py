@@ -9,7 +9,7 @@ import pytest
 # noinspection PyUnresolvedReferences
 from fixtures.index_server import index_server
 from dirs import test_data
-from util import child_names, process_output
+from utils import child_names, process_output
 
 
 class TestPayneLocal:
