@@ -32,6 +32,7 @@ class Project:
     def has_lock_file(self) -> bool:
         return self._lock_file().exists()
 
+    # TODO rename to export_constraints
     def create_requirements_from_lock_file(self, requirements_file: Path):
         args = [
             "uv",

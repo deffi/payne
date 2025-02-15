@@ -5,7 +5,6 @@ from pathlib import Path
 import shutil
 
 from payne.app import AppMetadata
-from payne.downloader import Downloader
 from payne.project import Project
 from payne.installer import Installer
 from payne.util.temp_file import TemporaryDirectory
@@ -57,31 +56,16 @@ class App:
         metadata.scripts.extend(scripts)
         self.write_metadata(metadata)
 
-    def install_project(self, project: Project, bin_dir: Path, locked: bool, package_indices: dict[str, str]):
+    def install_project(self, project: Project, bin_dir: Path, constraints_file: Path, package_indices: dict[str, str]):
         with TemporaryDirectory() as temp_dir:
-            if locked:
-                constraints = temp_dir / "requirements.txt"
-                project.create_requirements_from_lock_file(constraints)
-            else:
-                constraints = None
-
             temp_bin_dir = temp_dir / "bin"
-            Installer().install_project(project, self.root, temp_bin_dir, constraints=constraints, package_indices=package_indices)
+            Installer().install_project(project, self.root, temp_bin_dir, constraints=constraints_file, package_indices=package_indices)
             self._post_install(temp_bin_dir, bin_dir)
 
-    def install_package(self, package: Package, bin_dir: Path, locked: bool, package_indices: dict[str, str]):
+    def install_package(self, package: Package, bin_dir: Path, constraints_file: Path, package_indices: dict[str, str]):
         with TemporaryDirectory() as temp_dir:
-            if locked:
-                download_dir = temp_dir / "download"
-                project = Project(Downloader().download_and_unpack_sdist(package, download_dir, package_indices))
-
-                constraints = temp_dir / "requirements.txt"
-                project.create_requirements_from_lock_file(constraints)
-            else:
-                constraints = None
-
             temp_bin_dir = temp_dir / "bin"
-            Installer().install_package(package, self.root, temp_bin_dir, constraints=constraints, package_indices=package_indices)
+            Installer().install_package(package, self.root, temp_bin_dir, constraints=constraints_file, package_indices=package_indices)
             self._post_install(temp_bin_dir, bin_dir)
 
     def uninstall(self):

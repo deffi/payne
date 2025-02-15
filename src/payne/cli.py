@@ -22,7 +22,7 @@ def install(
         locked: bool = True,
         index: list[str] | None = None):  # TODO indices alias index?
 
-    package_indices = dict(i.split("=", 1) for i in index)
+    package_indices = dict(i.split("=", 1) for i in (index or ""))
 
     match name, version, from_:
         case n, v, None:

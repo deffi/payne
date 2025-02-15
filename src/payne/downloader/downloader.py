@@ -25,6 +25,8 @@ class Downloader:
         for url in package_indices.values():
             finder.add_index_url(url)
 
+        print(f"Downloading {package.requirement_specifier()}")
+
         # TODO handle not found
         result = finder.find_best_match(package.requirement_specifier())
         best_package = result.best

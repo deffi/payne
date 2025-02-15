@@ -5,9 +5,11 @@ import shutil
 
 
 from payne.app import App
+from payne.downloader import Downloader
 from payne.project import Project
 from payne.package import Package
 from payne.util.path import is_empty
+from payne.util.temp_file import TemporaryDirectory
 
 
 class Payne:
@@ -47,20 +49,44 @@ class Payne:
         print(f"Apps directory: {self.apps_dir}")
         print(f"Bin directory:  {self.bin_dir}")
 
-    def install_project(self, source_path: Path, *, locked: bool):
-        project = Project(source_path)
-        app = App(self._app_dir(project.name(), project.version()), project.name(), project.version())
+  # Installing:
+  # * If installing locked: determine constraints
+  #   * If installing a package: get the sdist as a temporary project
+  #   * Identify the project frontend
+  #   * Export constraints
+  # * If installing an (actual, not temporary) project: determine the version
+  #   * Try to read it from pyproject.toml
+  #   * If there is no pyproject or the version is dynamic
+  #     * Build the sdist (partly?) to get the metadata
+  # * Install (from the original source)
 
+    def _get_constraints(self, root: Path):
+        # Identify the project frontend
+        # Export constraints
+        ...
+
+    def install_project(self, root: Path, *, locked: bool):
+        project = Project(root)
+
+        name = project.name()  # Might have to build it?
+        version = project.version()  # Might have to build it
+
+        app = App(self._app_dir(name, version), name, version)
         if app.is_installed():
             # TODO allow reinstall
             # TODO allow treating this as a failure
             # TODO factor out "{app.name} {app.version}"
             print(f"{app.name} {app.version} is already installed")
         else:
-            print(f"Install {app.name} {app.version} from {project.root}")
-            app.install_project(project, self.bin_dir, locked, self._package_indices)
+            with TemporaryDirectory() as temp_dir:
+                constraints_file = temp_dir / "constraints.txt"
 
-        # TODO roll back if it fails (e.g., script already exists)
+                if locked:
+                    project.create_requirements_from_lock_file(constraints_file)
+
+                print(f"Install {app.name} {app.version} from {project.root}")
+                app.install_project(project, self.bin_dir, constraints_file, self._package_indices)
+                # TODO roll back if it fails (e.g., script already exists)
 
     def install_package(self, name: str, version: str, *, locked: bool):
         package = Package(name, version)
@@ -70,8 +96,16 @@ class Payne:
             # TODO duplication with install_from_local
             print(f"{app.name} {app.version} is already installed")
         else:
-            print(f"Install {app.name} {app.version}")
-            app.install_package(package, self.bin_dir, locked, self._package_indices)
+            with TemporaryDirectory() as temp_dir:
+                constraints_file = temp_dir / "constraints.txt"
+
+                if locked:
+                    download_dir = temp_dir / "download"
+                    project = Project(Downloader().download_and_unpack_sdist(package, download_dir, self._package_indices))
+                    project.create_requirements_from_lock_file(constraints_file)
+
+                print(f"Install {app.name} {app.version}")
+                app.install_package(package, self.bin_dir, constraints_file, self._package_indices)
 
     def uninstall(self, name: str, version: str):
         app = App(self._app_dir(name, version), name, version)

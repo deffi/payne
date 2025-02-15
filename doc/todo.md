@@ -1,5 +1,21 @@
 # Basic functionality
 
+On installing cowsay:
+  * Cowsay 5.0 has no wheel
+  * Cowsay (up to) 6.0 has no pyproject.toml -> uv export fails
+  * Cowsay 6.1 has no sdist
+
+Installing:
+  * If installing locked: determine locked dependencies
+    * If installing a package: get the sdist as a temporary project
+    * Identify the project frontend
+    * Export constraints
+  * If installing an (actual, not temporary) project: determine the version
+    * Try to read it from pyproject.toml
+    * If there is no pyproject or the version is dynamic
+      * Build the sdist (partly?) to get the metadata
+  * Install (from the original source)
+
 Extra package indices:
   * We're using different tools, sometimes in the same invocation
     * uv tool
