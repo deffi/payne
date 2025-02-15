@@ -24,7 +24,7 @@ class TestPayneLocal:
     @staticmethod
     def installed_apps(app_dir: Path) -> dict[str, set[str]]:
         return {name: child_names(app_dir / name)
-                for name in child_names(app_dir)}
+                for name in child_names(app_dir, missing_ok=True)}
 
     @staticmethod
     def installed_scripts(bin_dir: Path) -> set[str]:

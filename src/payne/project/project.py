@@ -9,7 +9,7 @@ import build
 import build.env
 import uv
 
-from payne.project import Pyproject
+from payne.project import Pyproject, Metadata
 from payne.project.build_frontend import Frontend
 from payne.util.file_system import TemporaryDirectory
 
@@ -20,19 +20,16 @@ class Project:
     def __init__(self, root: Path):
         self._root = root
 
-        self._name = None
-        self._version = None
-
     @property
     def root(self):
         return self._root
 
-    def _load_metadata(self):
+    @cache
+    def metadata(self) -> Metadata:
         pyproject_toml = self._root / "pyproject.toml"
         if pyproject_toml.exists():
             pyproject = Pyproject.load(pyproject_toml)
-            self._name = pyproject.name()
-            self._version = pyproject.version()
+            return Metadata(pyproject.name(), pyproject.version())
         else:
             # No pyproject.toml, seems like we have to build the project
             # TODO refactor
@@ -58,24 +55,12 @@ class Project:
                             key, value = line.split(": ", maxsplit=1)
                             # TODO better error handling
                             if key == "Name":
-                                self._name = value
+                                name = value
                             elif key == "Version":
-                                self._version = value
-
-        assert self._name is not None
-        assert self._version is not None
-
-    def name(self):
-        if self._name is None:
-            self._load_metadata()
-
-        return self._name
-
-    def version(self):
-        if self._version is None:
-            self._load_metadata()
-
-        return self._version
+                                version = value
+                        assert name
+                        assert version
+                        return Metadata(name, version)
 
     @cache
     def build_frontend(self) -> Frontend | None:

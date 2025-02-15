@@ -20,5 +20,5 @@ class TestProject():
     ])
     def test_metadata(self, directory: Path, name: str, version: str):
         project = Project(test_data / directory)
-        assert project.name() == name
-        assert project.version() == version
+        assert project.metadata().name == name
+        assert project.metadata().version == version

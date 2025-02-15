@@ -2,8 +2,14 @@ from pathlib import Path
 import subprocess
 
 
-def child_names(directory: Path) -> set[str]:
-    return {child.name for child in directory.iterdir()}
+def child_names(directory: Path, missing_ok: bool = False) -> set[str]:
+    try:
+        return {child.name for child in directory.iterdir()}
+    except FileNotFoundError:
+        if missing_ok:
+            return set()
+        else:
+            raise
 
 
 def process_output(args: list) -> tuple[str, str]:

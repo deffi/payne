@@ -47,7 +47,7 @@ class UvInstaller(Installer):
 
     def install_project(self, project: Project, target_dir: Path, bin_dir: Path, constraints: Path | None):
         self._uv_tool_install(
-            ["--from", project.root, project.name()],
+            ["--from", project.root, project.metadata().name],
             target_dir,
             bin_dir,
             constraints=constraints,

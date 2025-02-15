@@ -47,8 +47,8 @@ class Payne:
             match source:
                 case Project() as project:
                     # This might have to build the project
-                    name = project.name()
-                    version = project.version()
+                    name = project.metadata().name
+                    version = project.metadata().version
                 case Package() as package:
                     name = package.name
                     version = package.version
