@@ -32,8 +32,7 @@ class Project:
     def has_lock_file(self) -> bool:
         return self._lock_file().exists()
 
-    # TODO rename to export_constraints
-    def create_requirements_from_lock_file(self, requirements_file: Path):
+    def export_constraints(self, constraints_file: Path):
         args = [
             "uv",
             "export",
@@ -43,7 +42,7 @@ class Project:
             "--frozen",
             "--no-header",
             "--no-hashes",
-            "--output-file", requirements_file,
+            "--output-file", constraints_file,
         ]
 
         print(f"Calling uv: {shlex.join(map(str, args))}")
