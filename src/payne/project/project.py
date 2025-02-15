@@ -1,4 +1,4 @@
-from functools import cached_property
+from functools import cached_property, cache
 from pathlib import Path
 import re
 import shlex
@@ -11,6 +11,7 @@ import build.env
 import uv
 
 from payne.project import Pyproject
+from payne.project.build_frontend import Frontend
 from payne.util.temp_file import TemporaryDirectory
 
 
@@ -77,24 +78,6 @@ class Project:
 
         return self._version
 
-    def _lock_file(self) -> Path:
-        return self._root / "uv.lock"
-
-    def has_lock_file(self) -> bool:
-        return self._lock_file().exists()
-
-    def export_constraints(self, constraints_file: Path):
-        args = [
-            "uv",
-            "export",
-            "--project", self._root,
-            "--no-dev",
-            "--no-emit-project",
-            "--frozen",
-            "--no-header",
-            "--no-hashes",
-            "--output-file", constraints_file,
-        ]
-
-        print(f"Calling uv: {shlex.join(map(str, args))}")
-        subprocess.run(args, check=True)
+    @cache
+    def build_frontend(self) -> Frontend | None:
+        return Frontend.create(self.root)

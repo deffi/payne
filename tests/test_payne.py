@@ -153,7 +153,8 @@ class TestPayneLocal:
             # assert process_output([bin_dir / "foo-1.3.2"]) == (
             #     "This is foo 1.3.2\nThis is bar 1.2.0\nThis is baz 1.1.0\n", "")
 
-    @pytest.mark.parametrize("locked", [False, True])
+    # Cannot install sup with locked dependencies because it has no lockfile
+    @pytest.mark.parametrize("locked", [False])
     def test_install_local(self, locked):
         with TemporaryDirectory() as temp_dir:
             apps_dir = temp_dir / "apps"
@@ -161,7 +162,7 @@ class TestPayneLocal:
 
             payne = Payne(apps_dir, bin_dir, {"payne_test_data": "http://localhost:8000/payne_test_data"})
 
-            # Install foo 1.3.0
+            # Install sup 2.1.0
             payne.install_project(test_data / "sup-2.1.0", locked=locked)
             assert self.installed_apps(apps_dir) == {"sup": {"2.1.0"}}
             assert self.installed_scripts(bin_dir) == {"sup-2.1.0"}

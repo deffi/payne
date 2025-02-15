@@ -83,7 +83,9 @@ class Payne:
                 constraints_file = temp_dir / "constraints.txt"
 
                 if locked:
-                    project.export_constraints(constraints_file)
+                    frontend = project.build_frontend()
+                    # TODO handle not found
+                    frontend.export_constraints(constraints_file)
 
                 print(f"Install {app.name} {app.version} from {project.root}")
                 installer = Installer(self._package_indices)
@@ -104,7 +106,9 @@ class Payne:
                 if locked:
                     download_dir = temp_dir / "download"
                     project = Project(Downloader().download_and_unpack_sdist(package, download_dir, self._package_indices))
-                    project.export_constraints(constraints_file)
+                    frontend = project.build_frontend()
+                    # TODO handle not found
+                    frontend.export_constraints(constraints_file)
 
                 print(f"Install {app.name} {app.version}")
                 installer = Installer(self._package_indices)
