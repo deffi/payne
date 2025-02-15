@@ -47,6 +47,7 @@ def build_test_data(uv: str = "uv", rebuild: bool = False):
         Project("foo", "1.3.0"),
         Project("foo", "1.3.1"),
         Project("foo", "1.3.2"),
+        Project("sup", "2.1.0"),
     )
 
     for project in projects:

@@ -28,6 +28,7 @@ class TestTestData:
         ("foo", "1.3.0", "foo", "This is foo 1.3.0\nThis is bar 1.2.0\nThis is baz 1.1.0\n"),
         ("foo", "1.3.1", "foo", "This is foo 1.3.1\nThis is bar 1.2.0\nThis is baz 1.1.0\n"),
         ("foo", "1.3.2", "foo", "This is foo 1.3.2\nThis is bar 1.2.0\nThis is baz 1.1.0\n"),
+        # Cannot run sup in-project because it has no pyproject.toml
     ])
     def test_uv_run(self, name, version, script, expected):
         project = test_data / f"{name}-{version}"
@@ -91,6 +92,7 @@ class TestTestData:
         ("foo", "1.3.0", "foo", "This is foo 1.3.0\nThis is bar 1.2.1\nThis is baz 1.1.1\n"),  # Latest bar, latest baz
         ("foo", "1.3.1", "foo", "This is foo 1.3.1\nThis is bar 1.2.0\nThis is baz 1.1.1\n"),  # bar pinned, latest baz
         ("foo", "1.3.2", "foo", "This is foo 1.3.2\nThis is bar 1.2.0\nThis is baz 1.1.0\n"),  # bar pinned, baz pinned
+        ("sup", "2.1.0", "sup", "This is sup 2.1.0\n"),
     ])
     def test_uv_tool_run(self, name, version, script, expected):
         project = test_data / f"{name}-{version}"

@@ -56,6 +56,13 @@ version for each). Thus:
     version, even though a later version is available)
 
 
+## Set 2 (sup)
+
+`sup` uses `setup.py` in lieu of `pyproject.toml`. This means that metadata is
+not readily available without building at least a source distribution. Metadata
+is required to determine the name and version when installing a local project. 
+
+
 # Building the test projects
 
 Before running any tests that use the test projects, they must be built. This is
