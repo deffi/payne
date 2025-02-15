@@ -41,8 +41,12 @@ class Project:
                 with build.env.DefaultIsolatedEnv(installer="uv") as env:
                     builder = build.ProjectBuilder.from_isolated_env(env, self.root)
                     env.install(builder.build_system_requires)
+                    # TODO required?
                     env.install(builder.get_requires_for_build("sdist", {}))
-                    # builder.prepare("sdist", temp_dir)
+                    # TOOD consider instead:
+                    #   * builder.prepare("wheel", temp_dir) -> path to dist_info dir (as string)
+                    #   * dist_info/METADATA
+                    #   * dist_info/entry_points.txt -> we get the script names
                     sdist_file = Path(builder.build("sdist", temp_dir, {}))
                     with tarfile.open(sdist_file, 'r:*') as sdist:
                         print(sdist.getnames())
