@@ -4,7 +4,6 @@ import re
 import shlex
 import subprocess
 import tarfile
-from tkinter.font import names
 
 import build
 import build.env
