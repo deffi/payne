@@ -62,11 +62,6 @@ class Payne:
     #     * Build the sdist (partly?) to get the metadata
     # * Install (from the original source)
 
-    def _get_constraints(self, root: Path):
-        # Identify the project frontend
-        # Export constraints
-        ...
-
     def install_project(self, root: Path, *, locked: bool, reinstall: bool):
         project = Project(root)
 
