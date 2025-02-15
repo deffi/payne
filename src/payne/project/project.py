@@ -27,7 +27,6 @@ class Project:
 
     def _build_and_read_metadata(self) -> Metadata:
         # TODO refactor
-        # TODO can we just get the metadata without building the whole package?
         with TemporaryDirectory() as temp_dir:
             with build.env.DefaultIsolatedEnv(installer="uv") as env:
                 builder = build.ProjectBuilder.from_isolated_env(env, self.root)
@@ -49,13 +48,29 @@ class Project:
                     dist_metadata = DistMetadata.parse(dist_metadata_text)
                     return Metadata(dist_metadata.name(), dist_metadata.version())
 
+    def _prepare_and_read_metadata(self) -> Metadata:
+        # TODO refactor
+        with TemporaryDirectory() as temp_dir:
+            with build.env.DefaultIsolatedEnv(installer="uv") as env:
+                builder = build.ProjectBuilder.from_isolated_env(env, self.root)
+                env.install(builder.build_system_requires)
+                # TODO required?
+                # env.install(builder.get_requires_for_build("sdist", {}))
+                dist_info = Path(builder.prepare("wheel", temp_dir))
+                dist_metadata = DistMetadata.load(dist_info / "METADATA")
+                # We also get dist_info/entry_points.txt
+                return Metadata(dist_metadata.name(), dist_metadata.version())
+
     @cache
     def metadata(self) -> Metadata:
         try:
             return self._read_metadata_from_pyproject_toml()
         except FileNotFoundError:
-            # No pyproject.toml, seems like we have to build the project
-            return self._build_and_read_metadata()
+            # No pyproject.toml, seems like we have to prepare/build the project
+            # TODO which one is better? Building an sdist or preparing for a wheel?
+
+            # return self._build_and_read_metadata()
+            return self._prepare_and_read_metadata()
 
     @cache
     def build_frontend(self) -> Frontend | None:
