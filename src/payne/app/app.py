@@ -60,13 +60,21 @@ class App:
                 self.write_metadata(metadata)
 
     def uninstall(self):
-        metadata = self.read_metadata()
+        # TODO handle: script not found (others must still be deleted)
+        # TODO handle: metadata could not be read
+        try:
+            metadata = self.read_metadata()
 
-        for script in metadata.scripts:
-            print(f"Uninstall script {script}")
-            script.unlink(missing_ok=True)
+            for script in metadata.scripts:
+                print(f"Uninstall script {script}")
+                script.unlink(missing_ok=True)
 
-        shutil.rmtree(self.root)
+        except BaseException:
+            # TODO better
+            print("Error while uninstalling, uninstall may be incomplete")
+
+        finally:
+            shutil.rmtree(self.root)
 
     # Metadata #################################################################
 
