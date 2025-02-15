@@ -47,10 +47,10 @@ class App:
     def is_installed(self) -> bool:
         return self.root.exists()
 
-    def install(self, source: InstallSource, bin_dir: Path, constraints_file: Path, package_indices: dict[str, str]):
+    def install(self, installer: Installer, source: InstallSource, bin_dir: Path, constraints_file: Path):
         with TemporaryDirectory() as temp_dir:
             temp_bin_dir = temp_dir / "bin"
-            Installer(package_indices).install(source, self.root, temp_bin_dir, constraints=constraints_file)
+            installer.install(source, self.root, temp_bin_dir, constraints=constraints_file)
 
             scripts = self._install_scripts(temp_bin_dir, bin_dir)
 

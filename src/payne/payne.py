@@ -6,6 +6,7 @@ import shutil
 
 from payne.app import App
 from payne.downloader import Downloader
+from payne.installer import Installer
 from payne.project import Project
 from payne.package import Package
 from payne.util.path import is_empty
@@ -49,16 +50,16 @@ class Payne:
         print(f"Apps directory: {self.apps_dir}")
         print(f"Bin directory:  {self.bin_dir}")
 
-  # Installing:
-  # * If installing locked: determine constraints
-  #   * If installing a package: get the sdist as a temporary project
-  #   * Identify the project frontend
-  #   * Export constraints
-  # * If installing an (actual, not temporary) project: determine the version
-  #   * Try to read it from pyproject.toml
-  #   * If there is no pyproject or the version is dynamic
-  #     * Build the sdist (partly?) to get the metadata
-  # * Install (from the original source)
+    # Installing:
+    # * If installing locked: determine constraints
+    #   * If installing a package: get the sdist as a temporary project
+    #   * Identify the project frontend
+    #   * Export constraints
+    # * If installing an (actual, not temporary) project: determine the version
+    #   * Try to read it from pyproject.toml
+    #   * If there is no pyproject or the version is dynamic
+    #     * Build the sdist (partly?) to get the metadata
+    # * Install (from the original source)
 
     def _get_constraints(self, root: Path):
         # Identify the project frontend
@@ -85,7 +86,8 @@ class Payne:
                     project.create_requirements_from_lock_file(constraints_file)
 
                 print(f"Install {app.name} {app.version} from {project.root}")
-                app.install(project, self.bin_dir, constraints_file, self._package_indices)
+                installer = Installer(self._package_indices)
+                app.install(installer, project, self.bin_dir, constraints_file)
                 # TODO roll back if it fails (e.g., script already exists)
 
     def install_package(self, name: str, version: str, *, locked: bool):
@@ -105,7 +107,8 @@ class Payne:
                     project.create_requirements_from_lock_file(constraints_file)
 
                 print(f"Install {app.name} {app.version}")
-                app.install(package, self.bin_dir, constraints_file, self._package_indices)
+                installer = Installer(self._package_indices)
+                app.install(installer, package, self.bin_dir, constraints_file)
 
     def uninstall(self, name: str, version: str):
         app = App(self._app_dir(name, version), name, version)
