@@ -6,7 +6,7 @@ import shutil
 
 from payne.app import App
 from payne.downloader import Downloader
-from payne.installer import Installer
+from payne.installer import UvInstaller
 from payne.project import Project
 from payne.package import Package
 from payne.util.path import is_empty
@@ -88,7 +88,7 @@ class Payne:
                     frontend.export_constraints(constraints_file)
 
                 print(f"Install {app.name} {app.version} from {project.root}")
-                installer = Installer(self._package_indices)
+                installer = UvInstaller(self._package_indices)
                 app.install(installer, project, self.bin_dir, constraints_file)
                 # TODO roll back if it fails (e.g., script already exists)
 
@@ -111,7 +111,7 @@ class Payne:
                     frontend.export_constraints(constraints_file)
 
                 print(f"Install {app.name} {app.version}")
-                installer = Installer(self._package_indices)
+                installer = UvInstaller(self._package_indices)
                 app.install(installer, package, self.bin_dir, constraints_file)
 
     def uninstall(self, name: str, version: str):
