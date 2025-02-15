@@ -1,17 +1,5 @@
 # Basic functionality
 
-Installing:
-  * If installing locked: determine locked dependencies
-    * If installing a package: get the sdist as a temporary project
-    * Identify the project frontend
-    * Export constraints
-  * If installing an (actual, not temporary) project: determine the version
-    * Try to read it from pyproject.toml
-    * If there is no pyproject or the version is dynamic
-      * Build the sdist (partly?) to get the metadata
-  * Install (from the original source)
-
-
 Test installing from local index with dependency from PyPI
 
 Identify paths:

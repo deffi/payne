@@ -51,72 +51,68 @@ class Payne:
         print(f"Apps directory: {self.apps_dir}")
         print(f"Bin directory:  {self.bin_dir}")
 
-    # Installing:
-    # * If installing locked: determine constraints
-    #   * If installing a package: get the sdist as a temporary project
-    #   * Identify the project frontend
-    #   * Export constraints
-    # * If installing an (actual, not temporary) project: determine the version
-    #   * Try to read it from pyproject.toml
-    #   * If there is no pyproject or the version is dynamic
-    #     * Build the sdist (partly?) to get the metadata
-    # * Install (from the original source)
-
-    def install_project(self, root: Path, *, locked: bool, reinstall: bool):
-        project = Project(root)
-
-        name = project.name()  # Might have to build it?
-        version = project.version()  # Might have to build it
-
-        app = App(self._app_dir(name, version), name, version)
-        if app.is_installed():
-            if reinstall:
-                app.uninstall()
-            else:
-                raise AppVersionAlreadyInstalled(app)
-
-            print(f"{app.name} {app.version} is already installed")
-
+    def install(self, source: Project | Package, *, locked: bool, reinstall: bool):
         with TemporaryDirectory() as temp_dir:
+            # First, we need to determine the name and version so we know where
+            # to install it (unless overridden, which isn't implemented yet).
+            match source:
+                case Project() as project:
+                    # This might have to build the project
+                    name = project.name()
+                    version = project.version()
+                case Package() as package:
+                    name = package.name
+                    version = package.version
+                case _:
+                    raise TypeError(f"Unhandled source: {source}")
+
+            # Check whether the ap is already installed so we avoid extra work
+            # if we decide to stop
+            app = App(self._app_dir(name, version), name, version)
+            if app.is_installed():
+                if reinstall:
+                    app.uninstall()
+                else:
+                    raise AppVersionAlreadyInstalled(app)
+
+            # For a locked install, we have to determine the constraints
             constraints_file = temp_dir / "constraints.txt"
-
             if locked:
-                frontend = project.build_frontend()
-                # TODO handle not found
-                frontend.export_constraints(constraints_file)
+                match source:
+                    case Project() as project:
+                        frontend = project.build_frontend()
+                        # TODO handle not found
+                        frontend.export_constraints(constraints_file)
+                    case Package() as package:
+                        download_dir = temp_dir / "download"
+                        project = Project(Downloader().download_and_unpack_sdist(package, download_dir, self._package_indices))
+                        frontend = project.build_frontend()
+                        # TODO handle not found
+                        frontend.export_constraints(constraints_file)
+                    case _:
+                        raise TypeError(f"Unhandled source: {source}")
 
-            print(f"Install {app.name} {app.version} from {project.root}")
-            installer = UvInstaller(self._package_indices)
+            # We're now ready to install the app
+            match source:
+                case Project() as project:
+                    print(f"Install {app.name} {app.version} from {project.root}")
+                case Package() as package:
+                    print(f"Install {app.name} {app.version}")
+                case _:
+                    raise TypeError(f"Unhandled source: {source}")
 
-            with safe_ensure_exists(self._apps_dir / app.name):
-                app.install(installer, project, self.bin_dir, constraints_file)
-
-    def install_package(self, name: str, version: str, *, locked: bool, reinstall: bool):
-        package = Package(name, version)
-        app = App(self._app_dir(name, version), name, version)
-
-        if app.is_installed():
-            if reinstall:
-                app.uninstall()
-            else:
-                raise AppVersionAlreadyInstalled(app)
-
-        with TemporaryDirectory() as temp_dir:
-            constraints_file = temp_dir / "constraints.txt"
-
-            if locked:
-                download_dir = temp_dir / "download"
-                project = Project(Downloader().download_and_unpack_sdist(package, download_dir, self._package_indices))
-                frontend = project.build_frontend()
-                # TODO handle not found
-                frontend.export_constraints(constraints_file)
-
-            print(f"Install {app.name} {app.version}")
             installer = UvInstaller(self._package_indices)
 
             # TODO factor out self.(directory that contains the app dirs for the individual versions)
             with safe_ensure_exists(self._apps_dir / app.name):
-                app.install(installer, package, self.bin_dir, constraints_file)
+                app.install(installer, source, self.bin_dir, constraints_file)
+
+    def install_project(self, root: Path, *, locked: bool, reinstall: bool):
+        self.install(Project(root), locked=locked, reinstall=reinstall)
+
+    def install_package(self, name: str, version: str, *, locked: bool, reinstall: bool):
+        package = Package(name, version)
+        self.install(Package(name, version), locked=locked, reinstall=reinstall)
 
     def uninstall(self, name: str, version: str):
         app = App(self._app_dir(name, version), name, version)
