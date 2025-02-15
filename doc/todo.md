@@ -1,10 +1,5 @@
 # Basic functionality
 
-On installing cowsay:
-  * Cowsay 5.0 has no wheel
-  * Cowsay (up to) 6.0 has no pyproject.toml -> uv export fails
-  * Cowsay 6.1 has no sdist
-
 Installing:
   * If installing locked: determine locked dependencies
     * If installing a package: get the sdist as a temporary project
@@ -78,6 +73,8 @@ What is currently called "app" should be "app version", and then we can use
 
 Allow overriding name and version for projects; don't read metadata (or build
 the project) if name and version are overridden.
+
+Allow uninstalling all versions of a specific tool
 
 
 # Error handling

@@ -101,3 +101,16 @@ This should result in
     This is foo 1.3.2
     This is bar 1.2.0
     This is baz 1.1.0
+
+
+# Packages from PyPI
+
+Cowsay:
+  * Cowsay 5.0 has no wheel
+  * Cowsay (up to) 6.0 has no pyproject.toml -> uv export fails
+  * Cowsay 6.1 has no sdist
+
+All of them can be installed (Cowsay 5.0 has to be built from the sdist, which
+is handled automatically by uv). None of them can be installed with locked
+dependencies because there is no lockfile (6.1 doesn't even have an sdist, so we
+can't even check).
