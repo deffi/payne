@@ -74,8 +74,9 @@ class Payne:
                         frontend.export_constraints(constraints_file)
                     case Package() as package:
                         download_dir = temp_dir / "download"
-                        project = Project(Downloader().download_and_unpack_sdist(package, download_dir, self._package_indices))
-                        frontend = project.build_frontend()
+                        sdist = Downloader().download_and_unpack_sdist(package, download_dir, self._package_indices)
+                        temp_project = Project(sdist)
+                        frontend = temp_project.build_frontend()
                         # TODO handle not found
                         frontend.export_constraints(constraints_file)
                     case _:
@@ -85,7 +86,7 @@ class Payne:
             match source:
                 case Project() as project:
                     print(f"Install {app.name} {app.version} from {project.root}")
-                case Package() as package:
+                case Package():
                     print(f"Install {app.name} {app.version}")
                 case _:
                     raise TypeError(f"Unhandled source: {source}")
@@ -99,7 +100,6 @@ class Payne:
         self.install(Project(root), locked=locked, reinstall=reinstall)
 
     def install_package(self, name: str, version: str, *, locked: bool, reinstall: bool):
-        package = Package(name, version)
         self.install(Package(name, version), locked=locked, reinstall=reinstall)
 
     def uninstall(self, name: str, version: str):
