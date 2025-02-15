@@ -6,11 +6,12 @@ import shutil
 
 from payne.app import App
 from payne.downloader import Downloader
+from payne.exceptions import AppVersionAlreadyInstalled
 from payne.installer import UvInstaller
 from payne.project import Project
 from payne.package import Package
 from payne.util.path import is_empty
-from payne.util.temp_file import TemporaryDirectory
+from payne.util.file_system import TemporaryDirectory, safe_ensure_exists
 
 
 class Payne:
@@ -66,7 +67,7 @@ class Payne:
         # Export constraints
         ...
 
-    def install_project(self, root: Path, *, locked: bool):
+    def install_project(self, root: Path, *, locked: bool, reinstall: bool):
         project = Project(root)
 
         name = project.name()  # Might have to build it?
@@ -74,44 +75,52 @@ class Payne:
 
         app = App(self._app_dir(name, version), name, version)
         if app.is_installed():
-            # TODO allow reinstall
-            # TODO allow treating this as a failure
-            # TODO factor out "{app.name} {app.version}"
+            if reinstall:
+                app.uninstall()
+            else:
+                raise AppVersionAlreadyInstalled(app)
+
             print(f"{app.name} {app.version} is already installed")
-        else:
-            with TemporaryDirectory() as temp_dir:
-                constraints_file = temp_dir / "constraints.txt"
 
-                if locked:
-                    frontend = project.build_frontend()
-                    # TODO handle not found
-                    frontend.export_constraints(constraints_file)
+        with TemporaryDirectory() as temp_dir:
+            constraints_file = temp_dir / "constraints.txt"
 
-                print(f"Install {app.name} {app.version} from {project.root}")
-                installer = UvInstaller(self._package_indices)
+            if locked:
+                frontend = project.build_frontend()
+                # TODO handle not found
+                frontend.export_constraints(constraints_file)
+
+            print(f"Install {app.name} {app.version} from {project.root}")
+            installer = UvInstaller(self._package_indices)
+
+            with safe_ensure_exists(self._apps_dir / app.name):
                 app.install(installer, project, self.bin_dir, constraints_file)
-                # TODO roll back if it fails (e.g., script already exists)
 
-    def install_package(self, name: str, version: str, *, locked: bool):
+    def install_package(self, name: str, version: str, *, locked: bool, reinstall: bool):
         package = Package(name, version)
         app = App(self._app_dir(name, version), name, version)
 
         if app.is_installed():
-            # TODO duplication with install_from_local
-            print(f"{app.name} {app.version} is already installed")
-        else:
-            with TemporaryDirectory() as temp_dir:
-                constraints_file = temp_dir / "constraints.txt"
+            if reinstall:
+                app.uninstall()
+            else:
+                raise AppVersionAlreadyInstalled(app)
 
-                if locked:
-                    download_dir = temp_dir / "download"
-                    project = Project(Downloader().download_and_unpack_sdist(package, download_dir, self._package_indices))
-                    frontend = project.build_frontend()
-                    # TODO handle not found
-                    frontend.export_constraints(constraints_file)
+        with TemporaryDirectory() as temp_dir:
+            constraints_file = temp_dir / "constraints.txt"
 
-                print(f"Install {app.name} {app.version}")
-                installer = UvInstaller(self._package_indices)
+            if locked:
+                download_dir = temp_dir / "download"
+                project = Project(Downloader().download_and_unpack_sdist(package, download_dir, self._package_indices))
+                frontend = project.build_frontend()
+                # TODO handle not found
+                frontend.export_constraints(constraints_file)
+
+            print(f"Install {app.name} {app.version}")
+            installer = UvInstaller(self._package_indices)
+
+            # TODO factor out self.(directory that contains the app dirs for the individual versions)
+            with safe_ensure_exists(self._apps_dir / app.name):
                 app.install(installer, package, self.bin_dir, constraints_file)
 
     def uninstall(self, name: str, version: str):
