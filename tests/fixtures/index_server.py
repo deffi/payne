@@ -30,6 +30,6 @@ def _run_server():
     server.serve_forever()
 
 
-@pytest.fixture(scope="session", autouse=True)
+@pytest.fixture(scope="session", autouse=False)
 def index_server():
     Thread(target=_run_server, daemon=True).start()
