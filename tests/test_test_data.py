@@ -108,7 +108,7 @@ class TestTestData:
             # Uv may output messages on stderr.
             try:
                 output = subprocess.check_output(
-                    ["uv", "tool", "run", "--from", project, "--frozen", script],
+                    ["uv", "tool", "run", "--from", project, script],
                     cwd=project,
                     env=env,
                     stderr=subprocess.PIPE,
