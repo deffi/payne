@@ -54,6 +54,9 @@ e.g.
     uv run payne install --index payne_test_data=http://localhost:8000/payne_test_data foo 1.3.0 --no-locked
 While the server isn't running. Looks like it tries, but somthing still has the file open.
 
+Example error message from uv:
+    error: Failed to install: xyz.whl
+      Caused by: failed to read directory `...`: [exception message]
 
 # Nice to have features
 
@@ -79,6 +82,10 @@ Allow specifying app name and version
     name and version
 
 Allow uninstalling all versions of a specific tool
+
+For projects with backend hatchling, we can use `hatch version` to get the
+version instead of building the project. Maybe also for others? And is there a
+library interface to that? We'll still need the name from pyproject.toml.
 
 
 # Robustness
