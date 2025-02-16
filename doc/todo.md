@@ -19,9 +19,6 @@ Allow configuring uv binary with command line argument
 
 # Project
 
-Add project metadata
-https://packaging.python.org/en/latest/tutorials/packaging-projects/#configuring-metadata
-
 Verfify sdist contents
 
 
