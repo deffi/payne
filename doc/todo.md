@@ -17,11 +17,6 @@ Warn if the bin directory isn't in PATH
 Allow configuring uv binary with command line argument 
 
 
-# Project
-
-Verfify sdist contents
-
-
 # Desired features
 
 Payne list: message if there are no apps
