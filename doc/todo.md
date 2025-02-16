@@ -26,10 +26,6 @@ Find uv executable
 
 Identify apps directory like uv
 
-Store more script metadata:
-  * Original name
-  * Checksum, and don't delete it if it was changed
-
 Should we allow installing an app under a different name than the package name?
 This might be useful if we want to install packages with the same name from
 different repositories, or from a repository and from a local directory. But
