@@ -19,8 +19,6 @@ Allow configuring uv binary with command line argument
 
 # Desired features
 
-Payne list: message if there are no apps
-
 Don't re-use UV_* environment variables, use PAYNE_* or command line arguments
 instead
 

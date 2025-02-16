@@ -115,9 +115,15 @@ class Payne:
             print(f"{name} {version} is not installed")
 
     def list_(self):
+        any_apps = False
+
         for app in self.apps_dir.installed_apps():
+            any_apps = True
             print(f"{app.name} {app.version}")
             app_metadata = app.read_metadata()
 
             for script in app_metadata.scripts:
-                print(f"  - {script.name}")
+                print(f"  - {script.file.name}")
+
+        if not any_apps:
+            print("No apps installed")
