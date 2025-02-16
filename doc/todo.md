@@ -1,49 +1,53 @@
-# Basic functionality
+# Next 
+
+Can we speed up tests by using a file:// repository?
+
+
+# Essential
 
 Test installing from local index with dependency from PyPI
 
-Identify paths:
-  * Apps directory: ~/.local/share/payne/apps
+Identify paths like uv (`uv tool install`):
+  * Apps directory
+    * Unix: ~/.local/share/payne/apps
   * bin directory: ~/.local/bin
 
-When testing, clear the environment?
+Warn if the bin directory isn't in PATH
+
+Allow configuring uv binary with command line argument 
+
+Handle dynamic version in `pyproject.toml`? We'll have to do the same package
+building procedure as we do if there is no `pyproject.toml` in the first place.
 
 
-# Desired functionality
+# Project
 
-Find uv executable
-  * Command line `--uv`
-    * absolute
-    * relative starting with `./`?
-    * `PATH` lookup
-    * How do other tools do it?
-  * `$PAYNE_UV` (like `--uv`)
-  * User config
-    * Like command line, but no relative path
-  * System config
-    * Like user config
-  * Default `uv` (`PATH` lookup)
+Add project metadata
+https://packaging.python.org/en/latest/tutorials/packaging-projects/#configuring-metadata
 
-Identify apps directory like uv
+Verfify sdist contents
 
-Should we allow installing an app under a different name than the package name?
-This might be useful if we want to install packages with the same name from
-different repositories, or from a repository and from a local directory. But
-we'd also be likely to get conflicting scripts names.
 
-Uninstalling corrupted app installations (e.g. metadata file missing or can't
-be read)
+# Desired features
+
+Payne list: message if there are no apps
 
 Don't re-use UV_* environment variables, use PAYNE_* or command line arguments
 instead
 
-Allow overriding name and version for projects; don't read metadata (or build
-the project) if name and version are overridden.
-
-Allow uninstalling all versions of a specific tool
+Option to install without scripts
+  * Command to install/remove scripts after installing the app
 
 
 # Error handling
+
+Error while uninstalling:
+  * Reading metadata:
+    * Don't do anything
+    * Allow forcing (scripts might not be uninstalled)
+  * Deleting stuff (e.g., permission denied or file locked in bin directory)
+    * Continue deleting the rest
+    * Output a warning
 
 App (not app-version) directory isn't always remove when installation fails,
 e.g. 
@@ -51,21 +55,41 @@ e.g.
 While the server isn't running. Looks like it tries, but somthing still has the file open.
 
 
+# Nice to have features
+
+Configuration
+  * Source
+    * Command line --foo
+    * Environment $PAYNE_FOO
+    * User config
+    * System config
+    * Default
+  * For uv binary:
+    * Absolute path
+    * Relative path to CWD (command line only)
+    * Plain name, lookup in PATH
+  * How do other tools do it?
+    * uv
+    * pip
+
+Allow specifying app name and version
+  * When installing from a project, don't read the metadata (which might mean
+    building the project) if both are overridden
+  * When installing from a package, use the override values over the package
+    name and version
+
+Allow uninstalling all versions of a specific tool
+
+
 # Robustness
 
 All subprocess invocations:
   * Controlled environment (specify the entire environment to avoid accidentally
     picking up local configuration)
-  * Controlled PWD
+  * Controlled CWD
 
-Wherever listing files/directories, handle if there is an unexpectred
+Wherever listing files/directories, handle if there is an unexpected
 directory/file
-
-
-# Open questions
-
-Can uv have a dynamic version in `pyproject.toml`?
-  * Can we get it by building a source package?
 
 
 # Future work
@@ -93,6 +117,10 @@ Support installing with venv instead of uv
 
 # Tests
 
+Test data: different names for project, package, and script 
+
+When testing, clear the environment?
+
 Re-install an app
 Uninstall a non-installed app
 
@@ -101,3 +129,8 @@ CLI tests (mock class Payne)
 End-to-end tests
 
 Install cowsay
+
+Integrated server is (attempted) started twice
+
+Slow on Windows with integrated server
+
