@@ -9,7 +9,7 @@ from payne.util.file_system import TemporaryDirectory
 # Need this to be in scope so it can be autoused
 # noinspection PyUnresolvedReferences
 from fixtures.index_server import index_server
-from dirs import test_data
+from dirs import test_data, test_data_index_url
 
 
 @pytest.mark.test_data
@@ -38,7 +38,7 @@ class TestTestData:
             env = os.environ.copy()
             del env["VIRTUAL_ENV"]
             env["UV_PROJECT_ENVIRONMENT"] = str(temp_dir)
-            env["UV_INDEX"] = "payne_test_data=http://localhost:8000/payne_test_data"
+            env["UV_INDEX"] = f"payne_test_data={test_data_index_url}"
 
             # Create the project environment and install the project
             # We do this as a separate step so we don't get extra output from
@@ -102,7 +102,7 @@ class TestTestData:
         with TemporaryDirectory() as temp_dir:
             env = os.environ.copy()
             env["UV_TOOL_DIR"] = str(temp_dir)
-            env["UV_INDEX"] = "payne_test_data=http://localhost:8000/payne_test_data"
+            env["UV_INDEX"] = f"payne_test_data={test_data_index_url}"
 
             # Run the command as a tool
             # Uv may output messages on stderr.
