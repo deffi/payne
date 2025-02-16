@@ -16,9 +16,6 @@ Warn if the bin directory isn't in PATH
 
 Allow configuring uv binary with command line argument 
 
-Handle dynamic version in `pyproject.toml`? We'll have to do the same package
-building procedure as we do if there is no `pyproject.toml` in the first place.
-
 
 # Project
 
@@ -37,6 +34,10 @@ instead
 
 Option to install without scripts
   * Command to install/remove scripts after installing the app
+
+Better messages:
+  * When building a project
+  * Hide uv invocation messages?
 
 
 # Error handling
@@ -86,6 +87,12 @@ Allow uninstalling all versions of a specific tool
 For projects with backend hatchling, we can use `hatch version` to get the
 version instead of building the project. Maybe also for others? And is there a
 library interface to that? We'll still need the name from pyproject.toml.
+
+Colored output (with rich)
+
+App version metadata:
+  * From where the app was installed
+    * If from a project, whether it was built
 
 
 # Robustness

@@ -13,7 +13,9 @@ class Pyproject:
     def name(self):
         return self._data["project"]["name"]
 
-    def version(self) -> str:
-        # TODO better check
-        assert "version" not in self._data.get("dynamic", [])
+    def is_dynamic_version(self) -> bool:
+        return "version" in self._data["project"].get("dynamic", [])
+
+    def static_version(self) -> str:
+        assert not self.is_dynamic_version()
         return self._data["project"]["version"]

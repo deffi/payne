@@ -21,9 +21,9 @@ class Project:
     def root(self):
         return self._root
 
-    def _read_metadata_from_pyproject_toml(self) -> Metadata:
-        pyproject = Pyproject.load(self._root / "pyproject.toml")
-        return Metadata(pyproject.name(), pyproject.version())
+    @cache
+    def _pyproject(self) -> Pyproject:
+        return Pyproject.load(self._root / "pyproject.toml")
 
     def _build_and_read_metadata(self) -> Metadata:
         # TODO refactor
@@ -64,13 +64,17 @@ class Project:
     @cache
     def metadata(self) -> Metadata:
         try:
-            return self._read_metadata_from_pyproject_toml()
+            if not self._pyproject().is_dynamic_version():
+                return Metadata(self._pyproject().name(), self._pyproject().static_version())
         except FileNotFoundError:
-            # No pyproject.toml, seems like we have to prepare/build the project
-            # TODO which one is better? Building an sdist or preparing for a wheel?
+            pass
 
-            # return self._build_and_read_metadata()
-            return self._prepare_and_read_metadata()
+        # No pyproject.toml or dynamic version. Seems like we have to
+        # prepare/build the project
+        # TODO which one is better? Building an sdist or preparing for a wheel?
+
+        # return self._build_and_read_metadata()
+        return self._prepare_and_read_metadata()
 
     @cache
     def build_frontend(self) -> Frontend | None:

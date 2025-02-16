@@ -63,6 +63,13 @@ not readily available without building at least a source distribution. Metadata
 is required to determine the name and version when installing a local project. 
 
 
+## Set 3 (dyn)
+
+`dyn` uses a dynamic version in `pyproject.toml`. This means that we either have
+to invoke the respective build tool to determine the version, or we have to
+build a source distribution. 
+
+
 # Building the test projects
 
 Before running any tests that use the test projects, they must be built. This is
