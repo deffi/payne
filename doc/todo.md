@@ -6,11 +6,13 @@ For which build do we need the index set?
 Can we speed up tests by using a file:// repository?
   * Disable server fixture autouse
   * Verify that all tests fail
-  * Run with manually started server (record time Windows/Linux)
-    * Windows: 41 44 39 
-    * Linux: 118 92 100
+  * Run with manually started server (record time Windows/Linux) -m "not test_data"
+    * Windows: 33 37 33
+    * Linux: 66 60 48
   * Change all references
   * Run without server running (record time Windows/Linux)
+    * Windows: 30 36 30
+    * Linux 47 51 44
     * Locked install might not work because packages are pinned to a repo and
       the repo URL is in uv.lock. We might have to re-lock everything before.
   * Update documentation
@@ -161,3 +163,4 @@ Integrated server is (attempted) started twice
 
 Slow on Windows with integrated server
 
+When installing a project, make sure that the lockfile remains unchanged

@@ -45,7 +45,7 @@ class TestTestData:
             # the invocation of the script
             try:
                 subprocess.run(
-                    ["uv", "sync"],  # TODO ensure no changes to uv.lock?
+                    ["uv", "sync", "--frozen"],
                     cwd=project,
                     env=env,
                     stdout=subprocess.PIPE,
@@ -62,7 +62,7 @@ class TestTestData:
             # Run the command in the project
             try:
                 result = subprocess.run(
-                    ["uv", "run", script],  # TODO ensure no changes to uv.lock?
+                    ["uv", "run", "--frozen", script],
                     cwd=project,
                     env=env,
                     stdout=subprocess.PIPE,
@@ -108,7 +108,7 @@ class TestTestData:
             # Uv may output messages on stderr.
             try:
                 output = subprocess.check_output(
-                    ["uv", "tool", "run", "--from", project, script],
+                    ["uv", "tool", "run", "--from", project, "--frozen", script],
                     cwd=project,
                     env=env,
                     stderr=subprocess.PIPE,
