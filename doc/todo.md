@@ -31,6 +31,11 @@ Better messages:
   * When building a project
   * Hide uv invocation messages?
 
+Remove script name from metadata? On Windows, it includes the ".exe" suffix
+because it is generated from the files installed by uv.
+
+"Uninstall script" message is bad
+
 
 # Error handling
 
@@ -50,6 +55,8 @@ While the server isn't running. Looks like it tries, but somthing still has the 
 Example error message from uv:
     error: Failed to install: xyz.whl
       Caused by: failed to read directory `...`: [exception message]
+
+payne list: metadata could not be loaded
 
 # Nice to have features
 
