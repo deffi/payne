@@ -1,7 +1,19 @@
 # Next 
 
-Can we speed up tests by using a file:// repository?
+Why can we do build-test-data, but not `uv build` in `foo/`?
+For which build do we need the index set?
 
+Can we speed up tests by using a file:// repository?
+  * Disable server fixture autouse
+  * Verify that all tests fail
+  * Run with manually started server (record time Windows/Linux)
+    * Windows: 41 44 39 
+    * Linux: 118 92 100
+  * Change all references
+  * Run without server running (record time Windows/Linux)
+    * Locked install might not work because packages are pinned to a repo and
+      the repo URL is in uv.lock. We might have to re-lock everything before.
+  * Update documentation
 
 # Essential
 
@@ -18,6 +30,10 @@ Allow configuring uv binary with command line argument
 
 
 # Desired features
+
+The output of uv export does not contain information about what index a package
+is pinned to - not even the name. So on installation, if we're missing the index
+definition, might we install the wrong package (same name in a different index)?
 
 Don't re-use UV_* environment variables, use PAYNE_* or command line arguments
 instead
