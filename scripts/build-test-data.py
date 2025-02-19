@@ -50,7 +50,6 @@ def write_index(dir_: Path):
         yield '</ul>'
         yield '</body>'
         yield '</html>'
-        yield "</html>"
 
     file = dir_ / "index.html"
     print(f"Updating {file}")
