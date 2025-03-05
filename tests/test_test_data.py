@@ -5,7 +5,7 @@ import pytest
 
 from payne.util.file_system import TemporaryDirectory
 
-# from fixtures.index_server import index_server
+from fixtures.index_server import index_server
 from common import test_data, test_data_index_url_files, test_data_index_url_server
 
 
@@ -27,66 +27,66 @@ class TestTestData:
     #    * Re-write the lockfile to the new index
     #    * Ask the `uv` maintainers for a way to re-lock to a different index
     #      URL without upgrading
-    # @pytest.mark.parametrize("name, version, script, expected", [
-    #     #                                   Project version
-    #     #                                   |                  Dependency versions
-    #     #                                   '-----             '-----             '-----
-    #     ("baz", "1.1.0", "baz", "This is baz 1.1.0\n"),
-    #     ("baz", "1.1.1", "baz", "This is baz 1.1.1\n"),
-    #     ("bar", "1.2.0", "bar", "This is bar 1.2.0\nThis is baz 1.1.0\n"),
-    #     ("bar", "1.2.1", "bar", "This is bar 1.2.1\nThis is baz 1.1.0\n"),
-    #     ("foo", "1.3.0", "foo", "This is foo 1.3.0\nThis is bar 1.2.0\nThis is baz 1.1.0\n"),
-    #     ("foo", "1.3.1", "foo", "This is foo 1.3.1\nThis is bar 1.2.0\nThis is baz 1.1.0\n"),
-    #     ("foo", "1.3.2", "foo", "This is foo 1.3.2\nThis is bar 1.2.0\nThis is baz 1.1.0\n"),
-    #     # Cannot run sup in-project because it has no pyproject.toml
-    #     ("dyn", "3.1.0", "dyn", "This is dyn 3.1.0\n"),
-    # ])
-    # def test_uv_run(self, name, version, script, expected, index_server):
-    #     project = test_data / f"{name}-{version}"
-    #
-    #     with TemporaryDirectory() as temp_dir:
-    #         env = os.environ.copy()
-    #         del env["VIRTUAL_ENV"]
-    #         env["UV_PROJECT_ENVIRONMENT"] = str(temp_dir)
-    #         env["UV_INDEX"] = f"payne_test_data={test_data_index_url_files}"
-    #
-    #         # Create the project environment and install the project
-    #         # We do this as a separate step so we don't get extra output from
-    #         # the invocation of the script
-    #         try:
-    #             subprocess.run(
-    #                 ["uv", "sync", "--frozen", "--index", f"payne_test_data={test_data_index_url_server}"],
-    #                 cwd=project,
-    #                 env=env,
-    #                 stdout=subprocess.PIPE,
-    #                 stderr=subprocess.PIPE,
-    #                 encoding="utf-8",
-    #                 universal_newlines=True,
-    #                 check=True,
-    #             )
-    #         except subprocess.CalledProcessError as e:
-    #             print(e.stdout)
-    #             print(e.stderr)
-    #             assert False
-    #
-    #         # Run the command in the project
-    #         try:
-    #             result = subprocess.run(
-    #                 ["uv", "run", "--frozen", "--index", f"payne_test_data={test_data_index_url_files}", script],
-    #                 cwd=project,
-    #                 env=env,
-    #                 stdout=subprocess.PIPE,
-    #                 stderr=subprocess.PIPE,
-    #                 encoding="utf-8",
-    #                 universal_newlines=True,
-    #                 check=True,
-    #             )
-    #             assert result.stdout == expected
-    #             assert result.stderr == ""
-    #         except subprocess.CalledProcessError as e:
-    #             print(e.stdout)
-    #             print(e.stderr)
-    #             assert False
+    @pytest.mark.parametrize("name, version, script, expected", [
+        #                                   Project version
+        #                                   |                  Dependency versions
+        #                                   '-----             '-----             '-----
+        ("baz", "1.1.0", "baz", "This is baz 1.1.0\n"),
+        ("baz", "1.1.1", "baz", "This is baz 1.1.1\n"),
+        ("bar", "1.2.0", "bar", "This is bar 1.2.0\nThis is baz 1.1.0\n"),
+        ("bar", "1.2.1", "bar", "This is bar 1.2.1\nThis is baz 1.1.0\n"),
+        ("foo", "1.3.0", "foo", "This is foo 1.3.0\nThis is bar 1.2.0\nThis is baz 1.1.0\n"),
+        ("foo", "1.3.1", "foo", "This is foo 1.3.1\nThis is bar 1.2.0\nThis is baz 1.1.0\n"),
+        ("foo", "1.3.2", "foo", "This is foo 1.3.2\nThis is bar 1.2.0\nThis is baz 1.1.0\n"),
+        # Cannot run sup in-project because it has no pyproject.toml
+        ("dyn", "3.1.0", "dyn", "This is dyn 3.1.0\n"),
+    ])
+    def test_uv_run(self, name, version, script, expected, index_server):
+        project = test_data / f"{name}-{version}"
+
+        with TemporaryDirectory() as temp_dir:
+            env = os.environ.copy()
+            del env["VIRTUAL_ENV"]
+            env["UV_PROJECT_ENVIRONMENT"] = str(temp_dir)
+            env["UV_INDEX"] = f"payne_test_data={test_data_index_url_files}"
+
+            # Create the project environment and install the project
+            # We do this as a separate step so we don't get extra output from
+            # the invocation of the script
+            try:
+                subprocess.run(
+                    ["uv", "sync", "--frozen", "--index", f"payne_test_data={test_data_index_url_server}"],
+                    cwd=project,
+                    env=env,
+                    stdout=subprocess.PIPE,
+                    stderr=subprocess.PIPE,
+                    encoding="utf-8",
+                    universal_newlines=True,
+                    check=True,
+                )
+            except subprocess.CalledProcessError as e:
+                print(e.stdout)
+                print(e.stderr)
+                assert False
+
+            # Run the command in the project
+            try:
+                result = subprocess.run(
+                    ["uv", "run", "--frozen", "--index", f"payne_test_data={test_data_index_url_files}", script],
+                    cwd=project,
+                    env=env,
+                    stdout=subprocess.PIPE,
+                    stderr=subprocess.PIPE,
+                    encoding="utf-8",
+                    universal_newlines=True,
+                    check=True,
+                )
+                assert result.stdout == expected
+                assert result.stderr == ""
+            except subprocess.CalledProcessError as e:
+                print(e.stdout)
+                print(e.stderr)
+                assert False
 
     # Since we're installing the project as a uv tool, the lockfile will not be
     # honored and all dependencies will be at the latest version, unless pinned
