@@ -3,13 +3,11 @@ import subprocess
 
 import pytest
 
-import payne
+import dirs
 from payne.util.file_system import TemporaryDirectory
 
-# Need this to be in scope so it can be autoused
-# noinspection PyUnresolvedReferences
 from fixtures.index_server import index_server
-from dirs import test_data, test_data_index_url
+from dirs import test_data, test_data_index_url_files
 
 
 @pytest.mark.test_data
@@ -17,6 +15,19 @@ class TestTestData:
     # Since we're using uv to run a uv project, the lockfile will be honored and
     # all dependencies will be at the .0 version, as locked. The project version
     # (first line) will be the one from the project.
+    # TODO get rid of the index_server and use the file-based index. However,
+    # it's not that simple: re-locking the project does not seem to work:
+    #      uv run --index payne_test_data=file://.../run/payne_test_data foo
+    # This upgrades the locked version of bar (and only bar) from 1.2.0 to
+    # 1.2.1. If we use `--frozen`, it insists on using the index URL from the
+    # lockfile, and if we use `--locked`, it complains that it needs to update
+    # the lockfile.
+    # Possible solutions:
+    #    * Temporarily remove `bar` from `tool.uv.sources` in `pyproject.toml`.
+    #      This changes the lockfile, but does not upgrade the packages.
+    #    * Re-write the lockfile to the new index
+    #    * Ask the `uv` maintainers for a way to re-lock to a different index
+    #      URL without upgrading
     @pytest.mark.parametrize("name, version, script, expected", [
         #                                   Project version
         #                                   |                  Dependency versions
@@ -31,21 +42,21 @@ class TestTestData:
         # Cannot run sup in-project because it has no pyproject.toml
         ("dyn", "3.1.0", "dyn", "This is dyn 3.1.0\n"),
     ])
-    def test_uv_run(self, name, version, script, expected):
+    def test_uv_run(self, name, version, script, expected, index_server):
         project = test_data / f"{name}-{version}"
 
         with TemporaryDirectory() as temp_dir:
             env = os.environ.copy()
             del env["VIRTUAL_ENV"]
             env["UV_PROJECT_ENVIRONMENT"] = str(temp_dir)
-            env["UV_INDEX"] = f"payne_test_data={test_data_index_url}"
+            env["UV_INDEX"] = f"payne_test_data={test_data_index_url_files}"
 
             # Create the project environment and install the project
             # We do this as a separate step so we don't get extra output from
             # the invocation of the script
             try:
                 subprocess.run(
-                    ["uv", "sync", "--frozen"],
+                    ["uv", "sync", "--frozen", "--index", f"payne_test_data={dirs.test_data_index_url_server}"],
                     cwd=project,
                     env=env,
                     stdout=subprocess.PIPE,
@@ -62,7 +73,7 @@ class TestTestData:
             # Run the command in the project
             try:
                 result = subprocess.run(
-                    ["uv", "run", "--frozen", script],
+                    ["uv", "run", "--frozen", "--index", f"payne_test_data={dirs.test_data_index_url_files}", script],
                     cwd=project,
                     env=env,
                     stdout=subprocess.PIPE,
@@ -102,7 +113,7 @@ class TestTestData:
         with TemporaryDirectory() as temp_dir:
             env = os.environ.copy()
             env["UV_TOOL_DIR"] = str(temp_dir)
-            env["UV_INDEX"] = f"payne_test_data={test_data_index_url}"
+            env["UV_INDEX"] = f"payne_test_data={test_data_index_url_files}"
 
             # Run the command as a tool
             # Uv may output messages on stderr.

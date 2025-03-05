@@ -6,9 +6,7 @@ from payne.util.file_system import TemporaryDirectory
 
 import pytest
 
-# noinspection PyUnresolvedReferences
-from fixtures.index_server import index_server
-from dirs import test_data, test_data_index_url
+from dirs import test_data, test_data_index_url_files
 from utils import child_names, process_output
 
 
@@ -52,7 +50,7 @@ class TestPayneLocal:
             apps_dir = temp_dir / "apps"
             bin_dir = temp_dir / "bin"
 
-            payne = Payne(apps_dir, bin_dir, {"payne_test_data": test_data_index_url})
+            payne = Payne(apps_dir, bin_dir, {"payne_test_data": test_data_index_url_files})
 
             # Install foo 1.3.0
             install_app("foo", "1.3.0")
@@ -120,7 +118,7 @@ class TestPayneLocal:
             bin_dir = temp_dir / "bin"
 
             # TODO duplication of indices
-            payne = Payne(apps_dir, bin_dir, {"payne_test_data": test_data_index_url})
+            payne = Payne(apps_dir, bin_dir, {"payne_test_data": test_data_index_url_files})
 
             # Install foo 1.3.0
             install_app("foo", "1.3.0")
@@ -165,7 +163,7 @@ class TestPayneLocal:
             apps_dir = temp_dir / "apps"
             bin_dir = temp_dir / "bin"
 
-            payne = Payne(apps_dir, bin_dir, {"payne_test_data": test_data_index_url})
+            payne = Payne(apps_dir, bin_dir, {"payne_test_data": test_data_index_url_files})
 
             payne.install_project(test_data / f"{name}-{version}", locked=locked, reinstall=False)
             assert self.installed_apps(apps_dir) == {name: {version}}

@@ -2,13 +2,10 @@ import tomllib
 
 import pytest
 
-from dirs import test_data_index_url
+from dirs import test_data_index_url_files
 from payne.downloader import Downloader
 from payne.package import Package
 from payne.util.file_system import TemporaryDirectory
-
-# noinspection PyUnresolvedReferences
-from fixtures.index_server import index_server
 
 
 class TestDownload:
@@ -20,7 +17,7 @@ class TestDownload:
         with TemporaryDirectory() as temp_dir:
             # TODO factor out URL
             downloader = Downloader()
-            target = downloader.download_and_unpack_sdist(package, temp_dir, package_indices={"payne_test_data": test_data_index_url})
+            target = downloader.download_and_unpack_sdist(package, temp_dir, package_indices={"payne_test_data": test_data_index_url_files})
 
             pyproject_toml = target / "pyproject.toml"
             assert pyproject_toml.is_file()

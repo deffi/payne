@@ -79,26 +79,33 @@ projects. The results are placed in `run/payne_test_data`.
 
 # Serving the test projects
 
-Since Payne installs dependencies from a package repository, we need some
-packages in a local package repository.
+Since Payne installs dependencies from a package repository, we need some test
+packages in a local package repository. There are two major options for the
+repository location:
+  * File system
+  * HTTP server
 
-To run the local package repository manually, start a web server on
-`localhost:8000` that serves the contents of `run`. This can be
-accomplished by running in the project root:
+A file system repository it is less hassle (because we don't have to run a
+server) and slightly faster on both Windows and Linux.
+
+
+## File system repository
+
+In most cases, we can use a `file://` URL pointing to the local repository.
+
+
+
+## HTTP repository
+
+If we want to use an HTTP repository, we can start a web server on
+`localhost:8000` that serves the contents of `run`. This can be accomplished by
+running in the project root:
 
     uv run python -m http.server -d run
 
 The repository is then available at http://localhost:8000/payne_test_data.
 
-The automated tests run their own server on the same port by importing an
-auto-use `pytest` fixture. This server will run in a separate thread. If a
-server has already been started manually, the extra server will fail to start
-and the existing server will be used.
-
-
-## Testing the server
-
-With the server running, it should be possible to run
+To test the server, run
 
     export UV_INDEX=payne_test_data=http://localhost:8000/payne_test_data
     uv tool run foo
@@ -108,6 +115,16 @@ This should result in
     This is foo 1.3.2
     This is bar 1.2.0
     This is baz 1.1.0
+
+
+## Automated tests
+
+Most automated tests use a file system repository.
+
+For tests that need to use an HTTP repository, there's a Pytest fixture
+`fixtures.index_server.index_server` that runs a server in a separate thread.
+If a server has already been started manually, the extra server will fail to
+start and the existing server will be used.
 
 
 # Packages from PyPI
