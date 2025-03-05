@@ -70,6 +70,23 @@ to invoke the respective build tool to determine the version, or we have to
 build a source distribution. 
 
 
+## Set 4 (dep)
+
+`dep` has a dependency from PyPI. It has two versions:
+  * 4.1.0 depends on an unspecified version lower than 2.1.1 of `pygments`
+  * 4.1.1 depends on version 2.0 of `pygments`
+
+Both of them are locked to `pygments` 2.0. Thus:
+  * For unlocked install, we expect:
+    * `dep` 4.1.0: `pygments` 2.1 (the latest compatible version)
+    * `dep` 4.1.1: `pygments` 2.0 (specific version)
+  * For locked install, we expect `pygments` 2.0 (the locked version, even
+    though a later version is available)
+
+The `pygments` package was chosen because it has no further dependencies. A
+version ≥ 2 was chosen because they have wheels.
+
+
 # Building the test projects
 
 Before running any tests that use the test projects, they must be built. This is

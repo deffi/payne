@@ -1,0 +1,23 @@
+version = 1
+revision = 1
+requires-python = ">=3.11"
+
+[[package]]
+name = "dep"
+version = "4.1.1"
+source = { editable = "." }
+dependencies = [
+    { name = "pygments" },
+]
+
+[package.metadata]
+requires-dist = [{ name = "pygments", specifier = "==2.0" }]
+
+[[package]]
+name = "pygments"
+version = "2.0"
+source = { registry = "https://pypi.org/simple" }
+sdist = { url = "https://files.pythonhosted.org/packages/ba/ed/8f57fa7c35648dd2954d8b677fb07427d75a4497ec242ce64256bbcfda78/Pygments-2.0.tar.gz", hash = "sha256:4de23e88eeb7570e0425270d1013deff6343d78776dd38aeaf26c98ec3552421", size = 2710276 }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/b0/df/f3b9f10d4bdad8c9831ae234972fdd48b14c94bfd808240e0ecb306932a4/Pygments-2.0-py3-none-any.whl", hash = "sha256:90889e55af788d0a53c470fd1a324a9b7090cf4811e84de5e967dea9878a5fb6", size = 672416 },
+]

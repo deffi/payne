@@ -40,6 +40,8 @@ class TestTestData:
         ("foo", "1.3.2", "foo", "This is foo 1.3.2\nThis is bar 1.2.0\nThis is baz 1.1.0\n"),
         # Cannot run sup in-project because it has no pyproject.toml
         ("dyn", "3.1.0", "dyn", "This is dyn 3.1.0\n"),
+        ("dep", "4.1.0", "dep", "This is dep 4.1.0\nThis is pygments 2.0\n"),
+        ("dep", "4.1.1", "dep", "This is dep 4.1.1\nThis is pygments 2.0\n"),
     ])
     def test_uv_run(self, name, version, script, expected, index_server):
         project = test_data / f"{name}-{version}"
@@ -105,6 +107,8 @@ class TestTestData:
         ("foo", "1.3.2", "foo", "This is foo 1.3.2\nThis is bar 1.2.0\nThis is baz 1.1.0\n"),  # bar pinned, baz pinned
         ("sup", "2.1.0", "sup", "This is sup 2.1.0\n"),
         ("dyn", "3.1.0", "dyn", "This is dyn 3.1.0\n"),
+        ("dep", "4.1.0", "dep", "This is dep 4.1.0\nThis is pygments 2.1\n"),
+        ("dep", "4.1.1", "dep", "This is dep 4.1.1\nThis is pygments 2.0\n"),
     ])
     def test_uv_tool_run(self, name, version, script, expected):
         project = test_data / f"{name}-{version}"

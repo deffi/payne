@@ -61,7 +61,6 @@ app = App()
 
 @app.default
 def build_test_data(uv: str = "uv", rebuild: bool = False):
-
     projects = (
         Project("baz", "1.1.0"),
         Project("baz", "1.1.1"),
@@ -72,6 +71,8 @@ def build_test_data(uv: str = "uv", rebuild: bool = False):
         Project("foo", "1.3.2"),
         Project("sup", "2.1.0"),
         Project("dyn", "3.1.0"),
+        Project("dep", "4.1.0"),
+        Project("dep", "4.1.1"),
     )
 
     for project in projects:

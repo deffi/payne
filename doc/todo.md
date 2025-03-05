@@ -1,9 +1,10 @@
 # Next 
 
+Clean up test_payne
+
+Test installing from local index with dependency from PyPI (test project `dep`)
 
 # Essential
-
-Test installing from local index with dependency from PyPI
 
 Identify paths like uv (`uv tool install`):
   * Apps directory
