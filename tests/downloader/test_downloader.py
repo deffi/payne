@@ -2,7 +2,7 @@ import tomllib
 
 import pytest
 
-from dirs import test_data_index_url_files
+from common import test_data_index_url_files
 from payne.downloader import Downloader
 from payne.package import Package
 from payne.util.file_system import TemporaryDirectory

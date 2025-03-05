@@ -6,7 +6,7 @@ from payne.util.file_system import TemporaryDirectory
 
 import pytest
 
-from dirs import test_data, test_data_index_url_files
+from common import test_data, test_data_index_url_files
 from utils import child_names, process_output
 
 
@@ -152,7 +152,7 @@ class TestPayneLocal:
             #     "This is foo 1.3.2\nThis is bar 1.2.0\nThis is baz 1.1.0\n", "")
 
     # Cannot install sup or dyn with locked dependencies because they have no
-    # lockfiles
+    # lockfiles (TODO dyn does now)
     @pytest.mark.parametrize("locked", [False])
     @pytest.mark.parametrize("name, version", [
         ("sup", "2.1.0"),

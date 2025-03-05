@@ -3,11 +3,10 @@ import subprocess
 
 import pytest
 
-import dirs
 from payne.util.file_system import TemporaryDirectory
 
 from fixtures.index_server import index_server
-from dirs import test_data, test_data_index_url_files
+from common import test_data, test_data_index_url_files, test_data_index_url_server
 
 
 @pytest.mark.test_data
@@ -56,7 +55,7 @@ class TestTestData:
             # the invocation of the script
             try:
                 subprocess.run(
-                    ["uv", "sync", "--frozen", "--index", f"payne_test_data={dirs.test_data_index_url_server}"],
+                    ["uv", "sync", "--frozen", "--index", f"payne_test_data={test_data_index_url_server}"],
                     cwd=project,
                     env=env,
                     stdout=subprocess.PIPE,
@@ -73,7 +72,7 @@ class TestTestData:
             # Run the command in the project
             try:
                 result = subprocess.run(
-                    ["uv", "run", "--frozen", "--index", f"payne_test_data={dirs.test_data_index_url_files}", script],
+                    ["uv", "run", "--frozen", "--index", f"payne_test_data={test_data_index_url_files}", script],
                     cwd=project,
                     env=env,
                     stdout=subprocess.PIPE,

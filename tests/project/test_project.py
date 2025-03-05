@@ -4,7 +4,7 @@ from payne.project import Project
 
 import pytest
 
-from dirs import test_data
+from common import test_data
 
 
 class TestProject():

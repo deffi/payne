@@ -4,7 +4,7 @@ from threading import Thread
 
 import pytest
 
-from dirs import run
+from common import run
 
 
 class Handler(http.server.SimpleHTTPRequestHandler):
@@ -32,4 +32,5 @@ def _run_server():
 
 @pytest.fixture(scope="session", autouse=False)
 def index_server():
-    Thread(target=_run_server, daemon=True).start()
+    t = Thread(target=_run_server, daemon=True).start()
+
