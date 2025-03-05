@@ -36,6 +36,8 @@ because it is generated from the files installed by uv.
 
 "Uninstall script" message is bad
 
+Find out why the GitHub Windows test jobs fail during cleanup and re-enable them
+
 
 # Error handling
 
