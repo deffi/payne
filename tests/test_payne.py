@@ -10,7 +10,7 @@ from common import test_data, test_data_index_url_files
 from utils import child_names, process_output
 
 
-class TestPayneLocal:
+class TestPayne:
     @staticmethod
     def assert_app_valid(apps_dir: Path, name: str, version: str):
         assert (apps_dir / name)                                     .is_dir()   # app group dir
@@ -35,14 +35,14 @@ class TestPayneLocal:
 
         return script_files
 
-    @pytest.mark.parametrize("source", ["local", "remote"])
+    @pytest.mark.parametrize("source", ["project", "package"])
     def test_install_uninstall(self, source):
         with TemporaryDirectory() as temp_dir:
             def install_app(name: str, version: str):
                 match source:
-                    case "local":
+                    case "project":
                         payne.install_project(test_data / f"{name}-{version}", locked=False, reinstall=False)
-                    case "remote":
+                    case "package":
                         payne.install_package(name, version, locked=False, reinstall=False)
                     case _:
                         assert False
@@ -101,15 +101,15 @@ class TestPayneLocal:
             assert self.installed_apps(apps_dir) == {}
             assert self.installed_scripts(bin_dir) == set()
 
-    @pytest.mark.parametrize("source", ["local", "remote"])
+    @pytest.mark.parametrize("source", ["project", "package"])
     def test_install_locked(self, source):
         with TemporaryDirectory() as temp_dir:
             # TODO duplication
             def install_app(name: str, version: str):
                 match source:
-                    case "local":
+                    case "project":
                         payne.install_project(test_data / f"{name}-{version}", locked=True, reinstall=False)
-                    case "remote":
+                    case "package":
                         payne.install_package(name, version, locked=True, reinstall=False)
                     case _:
                         assert False
@@ -158,7 +158,7 @@ class TestPayneLocal:
         ("sup", "2.1.0"),
         ("dyn", "3.1.0"),
     ])
-    def test_install_local(self, locked, name, version):
+    def test_install_project(self, locked, name, version):
         with TemporaryDirectory() as temp_dir:
             apps_dir = temp_dir / "apps"
             bin_dir = temp_dir / "bin"
