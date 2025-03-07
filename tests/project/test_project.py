@@ -7,7 +7,7 @@ import pytest
 from common import test_data
 
 
-class TestProject():
+class TestProject:
     # TODO only sup is slow, the others are fast
     @pytest.mark.slow
     @pytest.mark.parametrize("directory, name, version", [
