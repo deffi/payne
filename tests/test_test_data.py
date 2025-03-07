@@ -8,6 +8,8 @@ from payne.util.file_system import TemporaryDirectory
 from fixtures.index_server import index_server
 from common import test_data, test_data_index_url_files, test_data_index_url_server
 
+from expected_output import expected_output
+
 
 @pytest.mark.test_data
 class TestTestData:
@@ -27,23 +29,23 @@ class TestTestData:
     #    * Re-write the lockfile to the new index
     #    * Ask the `uv` maintainers for a way to re-lock to a different index
     #      URL without upgrading
-    @pytest.mark.parametrize("name, version, script, expected", [
+    @pytest.mark.parametrize("name, version, script", [
         #                                   Project version
         #                                   |                  Dependency versions
         #                                   '-----             '-----             '-----
-        ("baz", "1.1.0", "baz", "This is baz 1.1.0\n"),
-        ("baz", "1.1.1", "baz", "This is baz 1.1.1\n"),
-        ("bar", "1.2.0", "bar", "This is bar 1.2.0\nThis is baz 1.1.0\n"),
-        ("bar", "1.2.1", "bar", "This is bar 1.2.1\nThis is baz 1.1.0\n"),
-        ("foo", "1.3.0", "foo", "This is foo 1.3.0\nThis is bar 1.2.0\nThis is baz 1.1.0\n"),
-        ("foo", "1.3.1", "foo", "This is foo 1.3.1\nThis is bar 1.2.0\nThis is baz 1.1.0\n"),
-        ("foo", "1.3.2", "foo", "This is foo 1.3.2\nThis is bar 1.2.0\nThis is baz 1.1.0\n"),
+        ("baz", "1.1.0", "baz"),
+        ("baz", "1.1.1", "baz"),
+        ("bar", "1.2.0", "bar"),
+        ("bar", "1.2.1", "bar"),
+        ("foo", "1.3.0", "foo"),
+        ("foo", "1.3.1", "foo"),
+        ("foo", "1.3.2", "foo"),
         # Cannot run sup in-project because it has no pyproject.toml
-        ("dyn", "3.1.0", "dyn", "This is dyn 3.1.0\n"),
-        ("dep", "4.1.0", "dep", "This is dep 4.1.0\nThis is pygments 2.0\n"),
-        ("dep", "4.1.1", "dep", "This is dep 4.1.1\nThis is pygments 2.0\n"),
+        ("dyn", "3.1.0", "dyn"),
+        ("dep", "4.1.0", "dep"),
+        ("dep", "4.1.1", "dep"),
     ])
-    def test_uv_run(self, name, version, script, expected, index_server):
+    def test_uv_run(self, name, version, script, index_server):
         project = test_data / f"{name}-{version}"
 
         with TemporaryDirectory() as temp_dir:
@@ -83,7 +85,7 @@ class TestTestData:
                     universal_newlines=True,
                     check=True,
                 )
-                assert result.stdout == expected
+                assert result.stdout == expected_output(name, version, True, script)
                 assert result.stderr == ""
             except subprocess.CalledProcessError as e:
                 print(e.stdout)
@@ -94,23 +96,20 @@ class TestTestData:
     # honored and all dependencies will be at the latest version, unless pinned
     # in the project. The project version (first line) will be the one from the
     # project.
-    @pytest.mark.parametrize("name, version, script, expected", [
-        #                                   Project version
-        #                                   |                  Dependency versions
-        #                                   '-----             '-----             '-----
-        ("baz", "1.1.0", "baz", "This is baz 1.1.0\n"),
-        ("baz", "1.1.1", "baz", "This is baz 1.1.1\n"),
-        ("bar", "1.2.0", "bar", "This is bar 1.2.0\nThis is baz 1.1.1\n"),  # Latest baz
-        ("bar", "1.2.1", "bar", "This is bar 1.2.1\nThis is baz 1.1.1\n"),  # Latest baz
-        ("foo", "1.3.0", "foo", "This is foo 1.3.0\nThis is bar 1.2.1\nThis is baz 1.1.1\n"),  # Latest bar, latest baz
-        ("foo", "1.3.1", "foo", "This is foo 1.3.1\nThis is bar 1.2.0\nThis is baz 1.1.1\n"),  # bar pinned, latest baz
-        ("foo", "1.3.2", "foo", "This is foo 1.3.2\nThis is bar 1.2.0\nThis is baz 1.1.0\n"),  # bar pinned, baz pinned
-        ("sup", "2.1.0", "sup", "This is sup 2.1.0\n"),
-        ("dyn", "3.1.0", "dyn", "This is dyn 3.1.0\n"),
-        ("dep", "4.1.0", "dep", "This is dep 4.1.0\nThis is pygments 2.1\n"),
-        ("dep", "4.1.1", "dep", "This is dep 4.1.1\nThis is pygments 2.0\n"),
+    @pytest.mark.parametrize("name, version, script", [
+        ("baz", "1.1.0", "baz"),
+        ("baz", "1.1.1", "baz"),
+        ("bar", "1.2.0", "bar"),
+        ("bar", "1.2.1", "bar"),
+        ("foo", "1.3.0", "foo"),
+        ("foo", "1.3.1", "foo"),
+        ("foo", "1.3.2", "foo"),
+        ("sup", "2.1.0", "sup"),
+        ("dyn", "3.1.0", "dyn"),
+        ("dep", "4.1.0", "dep"),
+        ("dep", "4.1.1", "dep"),
     ])
-    def test_uv_tool_run(self, name, version, script, expected):
+    def test_uv_tool_run(self, name, version, script):
         project = test_data / f"{name}-{version}"
 
         with TemporaryDirectory() as temp_dir:
@@ -129,7 +128,7 @@ class TestTestData:
                     encoding="utf-8",
                     universal_newlines=True,
                 )
-                assert output == expected
+                assert output == expected_output(name, version, False, script)
             except subprocess.CalledProcessError as e:
                 print(e.stdout)
                 print(e.stderr)

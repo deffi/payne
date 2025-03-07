@@ -10,6 +10,8 @@ import pytest
 from common import test_data, test_data_index_url_files
 from utils import child_names, process_output
 
+from expected_output import expected_output
+
 
 class TestPayne:
     @staticmethod
@@ -76,13 +78,9 @@ class TestPayne:
 
             # Run the scripts
             # Windows will automatically use the .exe
-            # TODO factor out expected output
-            assert process_output([bin_dir / "foo-1.3.0"]) == (
-                "This is foo 1.3.0\nThis is bar 1.2.1\nThis is baz 1.1.1\n", "")
-            assert process_output([bin_dir / "foo-1.3.1"]) == (
-                "This is foo 1.3.1\nThis is bar 1.2.0\nThis is baz 1.1.1\n", "")
-            assert process_output([bin_dir / "foo-1.3.2"]) == (
-                "This is foo 1.3.2\nThis is bar 1.2.0\nThis is baz 1.1.0\n", "")
+            assert process_output([bin_dir / "foo-1.3.0"]) == (expected_output("foo", "1.3.0", False, "foo"), "")
+            assert process_output([bin_dir / "foo-1.3.1"]) == (expected_output("foo", "1.3.1", False, "foo"), "")
+            assert process_output([bin_dir / "foo-1.3.2"]) == (expected_output("foo", "1.3.2", False, "foo"), "")
 
             # Uninstall foo 1.3.0
             payne.uninstall("foo", "1.3.0")
@@ -103,42 +101,42 @@ class TestPayne:
             assert self.installed_scripts(bin_dir) == set()
 
     @pytest.mark.parametrize("source", ["project", "package"])
-    @pytest.mark.parametrize("name, version, locked, script, expected_output", [
+    @pytest.mark.parametrize("name, version, locked, script", [
         # baz 1.1.0
-        ("baz", "1.1.0", False, "baz", "This is baz 1.1.0\n"),
-        ("baz", "1.1.0", True , "baz", "This is baz 1.1.0\n"),
+        ("baz", "1.1.0", False, "baz"),
+        ("baz", "1.1.0", True , "baz"),
         # baz 1.1.1
-        ("baz", "1.1.1", False, "baz", "This is baz 1.1.1\n"),
-        ("baz", "1.1.1", True , "baz", "This is baz 1.1.1\n"),
+        ("baz", "1.1.1", False, "baz"),
+        ("baz", "1.1.1", True , "baz"),
         # bar 1.2.0: latest baz
-        ("bar", "1.2.0", False, "bar", "This is bar 1.2.0\nThis is baz 1.1.1\n"),
-        ("bar", "1.2.0", True , "bar", "This is bar 1.2.0\nThis is baz 1.1.0\n"),
+        ("bar", "1.2.0", False, "bar"),
+        ("bar", "1.2.0", True , "bar"),
         # bar 1.2.1: latest baz
-        ("bar", "1.2.1", False, "bar", "This is bar 1.2.1\nThis is baz 1.1.1\n"),
-        ("bar", "1.2.1", True , "bar", "This is bar 1.2.1\nThis is baz 1.1.0\n"),
+        ("bar", "1.2.1", False, "bar"),
+        ("bar", "1.2.1", True , "bar"),
         # foo 1.3.0: latest bar, latest baz
-        ("foo", "1.3.0", False, "foo", "This is foo 1.3.0\nThis is bar 1.2.1\nThis is baz 1.1.1\n"),
-        ("foo", "1.3.0", True , "foo", "This is foo 1.3.0\nThis is bar 1.2.0\nThis is baz 1.1.0\n"),
+        ("foo", "1.3.0", False, "foo"),
+        ("foo", "1.3.0", True , "foo"),
         # foo 1.3.1: bar pinned, latest baz
-        ("foo", "1.3.1", False, "foo", "This is foo 1.3.1\nThis is bar 1.2.0\nThis is baz 1.1.1\n"),
-        ("foo", "1.3.1", True , "foo", "This is foo 1.3.1\nThis is bar 1.2.0\nThis is baz 1.1.0\n"),
+        ("foo", "1.3.1", False, "foo"),
+        ("foo", "1.3.1", True , "foo"),
         # foo 1.3.2: bar pinned, baz pinned
-        ("foo", "1.3.2", False, "foo", "This is foo 1.3.2\nThis is bar 1.2.0\nThis is baz 1.1.0\n"),
-        ("foo", "1.3.2", True , "foo", "This is foo 1.3.2\nThis is bar 1.2.0\nThis is baz 1.1.0\n"),
+        ("foo", "1.3.2", False, "foo"),
+        ("foo", "1.3.2", True , "foo"),
         # sup 2.1.0
-        ("sup", "2.1.0", False, "sup", "This is sup 2.1.0\n"),
+        ("sup", "2.1.0", False, "sup"),
         # (Cannot install `sup` locked because it has no lockfile)
         # dyn 3.1.0
-        ("dyn", "3.1.0", False, "dyn", "This is dyn 3.1.0\n"),
-        ("dyn", "3.1.0", True , "dyn", "This is dyn 3.1.0\n"),
+        ("dyn", "3.1.0", False, "dyn"),
+        ("dyn", "3.1.0", True , "dyn"),
         # dep 4.1.0: pygments constrained
-        ("dep", "4.1.0", False, "dep", "This is dep 4.1.0\nThis is pygments 2.1\n"),
-        ("dep", "4.1.0", True , "dep", "This is dep 4.1.0\nThis is pygments 2.0\n"),
+        ("dep", "4.1.0", False, "dep"),
+        ("dep", "4.1.0", True , "dep"),
         # dep 4.1.1: pygments pinned
-        ("dep", "4.1.1", False, "dep", "This is dep 4.1.1\nThis is pygments 2.0\n"),
-        ("dep", "4.1.1", True , "dep", "This is dep 4.1.1\nThis is pygments 2.0\n"),
+        ("dep", "4.1.1", False, "dep"),
+        ("dep", "4.1.1", True , "dep"),
     ])
-    def test_install_app(self, name, version, script, source, locked, expected_output):
+    def test_install_app(self, name, version, script, source, locked):
         with TemporaryDirectory() as temp_dir:
             apps_dir = temp_dir / "apps"
             bin_dir = temp_dir / "bin"
@@ -157,7 +155,8 @@ class TestPayne:
             assert self.installed_scripts(bin_dir) == {f"{script}-{version}"}
             self.assert_app_valid(apps_dir, name, version)
 
-            assert process_output([bin_dir / f"{script}-{version}"]) == (expected_output, "")
+            expected = expected_output(name, version, locked, script)
+            assert process_output([bin_dir / f"{script}-{version}"]) == (expected, "")
 
     @pytest.mark.parametrize("source", ["project", "package"])
     @pytest.mark.parametrize("name, version, locked", [
