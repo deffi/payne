@@ -38,7 +38,7 @@ class TestPayne:
 
         return script_files
 
-    @pytest.mark.parametrize("source", ["project", "package"])
+    @pytest.mark.parametrize("source", ["package", "project"])
     def test_install_uninstall(self, source):
         with TemporaryDirectory() as temp_dir:
             def install_app(name: str, version: str):
@@ -100,7 +100,7 @@ class TestPayne:
             assert self.installed_apps(apps_dir) == {}
             assert self.installed_scripts(bin_dir) == set()
 
-    @pytest.mark.parametrize("source", ["project", "package"])
+    @pytest.mark.parametrize("source", ["package", "project"])
     @pytest.mark.parametrize("name, version, locked, script", [
         # baz 1.1.0
         ("baz", "1.1.0", False, "baz"),
@@ -158,7 +158,7 @@ class TestPayne:
             expected = expected_output(name, version, locked, script)
             assert process_output([bin_dir / f"{script}-{version}"]) == (expected, "")
 
-    @pytest.mark.parametrize("source", ["project", "package"])
+    @pytest.mark.parametrize("source", ["package", "project"])
     @pytest.mark.parametrize("name, version, locked", [
         ("sup", "2.1.0", True),
     ])
