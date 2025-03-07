@@ -3,6 +3,7 @@ from pathlib import Path
 
 from payne import Payne
 from payne.util.file_system import TemporaryDirectory
+from payne.exceptions import FrontendNotRecognized
 
 import pytest
 
@@ -102,73 +103,78 @@ class TestPayne:
             assert self.installed_scripts(bin_dir) == set()
 
     @pytest.mark.parametrize("source", ["project", "package"])
-    def test_install_locked(self, source):
-        with TemporaryDirectory() as temp_dir:
-            # TODO duplication
-            def install_app(name: str, version: str):
-                match source:
-                    case "project":
-                        payne.install_project(test_data / f"{name}-{version}", locked=True, reinstall=False)
-                    case "package":
-                        payne.install_package(name, version, locked=True, reinstall=False)
-                    case _:
-                        assert False
-
-            apps_dir = temp_dir / "apps"
-            bin_dir = temp_dir / "bin"
-
-            # TODO duplication of indices
-            payne = Payne(apps_dir, bin_dir, {"payne_test_data": test_data_index_url_files})
-
-            # Install foo 1.3.0
-            install_app("foo", "1.3.0")
-            assert self.installed_apps(apps_dir) == {"foo": {"1.3.0"}}
-            assert self.installed_scripts(bin_dir) == {"foo-1.3.0"}
-            self.assert_app_valid(apps_dir, "foo", "1.3.0")
-
-            # # Install foo 1.3.1
-            # install_app("foo", "1.3.1")
-            # assert self.installed_apps(apps_dir) == {"foo": {"1.3.0", "1.3.1"}}
-            # assert self.installed_scripts(bin_dir) == {"foo-1.3.0", "foo-1.3.1"}
-            # self.assert_app_valid(apps_dir, "foo", "1.3.0")
-            # self.assert_app_valid(apps_dir, "foo", "1.3.1")
-            #
-            # # Install foo 1.3.2
-            # install_app("foo", "1.3.2")
-            # assert self.installed_apps(apps_dir) == {"foo": {"1.3.0", "1.3.1", "1.3.2"}}
-            # assert self.installed_scripts(bin_dir) == {"foo-1.3.0", "foo-1.3.1", "foo-1.3.2"}
-            # self.assert_app_valid(apps_dir, "foo", "1.3.0")
-            # self.assert_app_valid(apps_dir, "foo", "1.3.1")
-            # self.assert_app_valid(apps_dir, "foo", "1.3.2")
-
-            # Run the scripts
-            # Windows will automatically use the .exe
-            # Locked means that all versions use bar 1.2.0 and baz 1.1.0
-            assert process_output([bin_dir / "foo-1.3.0"]) == (
-                "This is foo 1.3.0\nThis is bar 1.2.0\nThis is baz 1.1.0\n", "")
-            # assert process_output([bin_dir / "foo-1.3.1"]) == (
-            #     "This is foo 1.3.1\nThis is bar 1.2.0\nThis is baz 1.1.0\n", "")
-            # assert process_output([bin_dir / "foo-1.3.2"]) == (
-            #     "This is foo 1.3.2\nThis is bar 1.2.0\nThis is baz 1.1.0\n", "")
-
-    # Cannot install sup or dyn with locked dependencies because they have no
-    # lockfiles (TODO dyn does now)
-    @pytest.mark.parametrize("locked", [False])
-    @pytest.mark.parametrize("name, version", [
-        ("sup", "2.1.0"),
-        ("dyn", "3.1.0"),
+    @pytest.mark.parametrize("name, version, locked, script, expected_output", [
+        # baz 1.1.0
+        ("baz", "1.1.0", False, "baz", "This is baz 1.1.0\n"),
+        ("baz", "1.1.0", True , "baz", "This is baz 1.1.0\n"),
+        # baz 1.1.1
+        ("baz", "1.1.1", False, "baz", "This is baz 1.1.1\n"),
+        ("baz", "1.1.1", True , "baz", "This is baz 1.1.1\n"),
+        # bar 1.2.0: latest baz
+        ("bar", "1.2.0", False, "bar", "This is bar 1.2.0\nThis is baz 1.1.1\n"),
+        ("bar", "1.2.0", True , "bar", "This is bar 1.2.0\nThis is baz 1.1.0\n"),
+        # bar 1.2.1: latest baz
+        ("bar", "1.2.1", False, "bar", "This is bar 1.2.1\nThis is baz 1.1.1\n"),
+        ("bar", "1.2.1", True , "bar", "This is bar 1.2.1\nThis is baz 1.1.0\n"),
+        # foo 1.3.0: latest bar, latest baz
+        ("foo", "1.3.0", False, "foo", "This is foo 1.3.0\nThis is bar 1.2.1\nThis is baz 1.1.1\n"),
+        ("foo", "1.3.0", True , "foo", "This is foo 1.3.0\nThis is bar 1.2.0\nThis is baz 1.1.0\n"),
+        # foo 1.3.1: bar pinned, latest baz
+        ("foo", "1.3.1", False, "foo", "This is foo 1.3.1\nThis is bar 1.2.0\nThis is baz 1.1.1\n"),
+        ("foo", "1.3.1", True , "foo", "This is foo 1.3.1\nThis is bar 1.2.0\nThis is baz 1.1.0\n"),
+        # foo 1.3.2: bar pinned, baz pinned
+        ("foo", "1.3.2", False, "foo", "This is foo 1.3.2\nThis is bar 1.2.0\nThis is baz 1.1.0\n"),
+        ("foo", "1.3.2", True , "foo", "This is foo 1.3.2\nThis is bar 1.2.0\nThis is baz 1.1.0\n"),
+        # sup 2.1.0
+        ("sup", "2.1.0", False, "sup", "This is sup 2.1.0\n"),
+        # (Cannot install `sup` locked because it has no lockfile)
+        # dyn 3.1.0
+        ("dyn", "3.1.0", False, "dyn", "This is dyn 3.1.0\n"),
+        ("dyn", "3.1.0", True , "dyn", "This is dyn 3.1.0\n"),
+        # dep 4.1.0: pygments constrained
+        ("dep", "4.1.0", False, "dep", "This is dep 4.1.0\nThis is pygments 2.1\n"),
+        ("dep", "4.1.0", True , "dep", "This is dep 4.1.0\nThis is pygments 2.0\n"),
+        # dep 4.1.1: pygments pinned
+        ("dep", "4.1.1", False, "dep", "This is dep 4.1.1\nThis is pygments 2.0\n"),
+        ("dep", "4.1.1", True , "dep", "This is dep 4.1.1\nThis is pygments 2.0\n"),
     ])
-    def test_install_project(self, locked, name, version):
+    def test_install_app(self, name, version, script, source, locked, expected_output):
         with TemporaryDirectory() as temp_dir:
             apps_dir = temp_dir / "apps"
             bin_dir = temp_dir / "bin"
 
             payne = Payne(apps_dir, bin_dir, {"payne_test_data": test_data_index_url_files})
 
-            payne.install_project(test_data / f"{name}-{version}", locked=locked, reinstall=False)
+            match source:
+                case "project":
+                    payne.install_project(test_data / f"{name}-{version}", locked=locked, reinstall=False)
+                case "package":
+                    payne.install_package(name, version, locked=locked, reinstall=False)
+                case _:
+                    assert False
+
             assert self.installed_apps(apps_dir) == {name: {version}}
-            assert self.installed_scripts(bin_dir) == {f"{name}-{version}"}
+            assert self.installed_scripts(bin_dir) == {f"{script}-{version}"}
             self.assert_app_valid(apps_dir, name, version)
 
-            assert process_output([bin_dir / f"{name}-{version}"]) == (
-                f"This is {name} {version}\n", "")
+            assert process_output([bin_dir / f"{script}-{version}"]) == (expected_output, "")
+
+    @pytest.mark.parametrize("source", ["project", "package"])
+    @pytest.mark.parametrize("name, version, locked", [
+        ("sup", "2.1.0", True),
+    ])
+    def test_install_app_no_frontend(self, name, version, source, locked):
+        with TemporaryDirectory() as temp_dir:
+            apps_dir = temp_dir / "apps"
+            bin_dir = temp_dir / "bin"
+
+            payne = Payne(apps_dir, bin_dir, {"payne_test_data": test_data_index_url_files})
+
+            with pytest.raises(FrontendNotRecognized):
+                match source:
+                    case "project":
+                        payne.install_project(test_data / f"{name}-{version}", locked=locked, reinstall=False)
+                    case "package":
+                        payne.install_package(name, version, locked=locked, reinstall=False)
+                    case _:
+                        assert False
