@@ -5,7 +5,7 @@ import shutil
 
 from payne.app import AppVersion, AppsDir
 from payne.downloader import Downloader
-from payne.exceptions import AppVersionAlreadyInstalled
+from payne.exceptions import AppVersionAlreadyInstalled, FrontendNotRecognized
 from payne.installer import UvInstaller
 from payne.project import Project
 from payne.package import Package
@@ -70,17 +70,21 @@ class Payne:
                 match source:
                     case Project() as project:
                         frontend = project.build_frontend()
-                        # TODO handle not found
-                        frontend.export_constraints(constraints_file)
+
                     case Package() as package:
                         download_dir = temp_dir / "download"
                         sdist = Downloader().download_and_unpack_sdist(package, download_dir, self._package_indices)
                         temp_project = Project(sdist)
+
                         frontend = temp_project.build_frontend()
-                        # TODO handle not found
-                        frontend.export_constraints(constraints_file)
+
                     case _:
                         raise TypeError(f"Unhandled source: {source}")
+
+                if frontend is None:
+                    raise FrontendNotRecognized(source)
+
+                frontend.export_constraints(constraints_file)
 
             # We're now ready to install the app
             match source:
