@@ -11,6 +11,8 @@ Warn if the bin directory isn't in PATH
 
 Allow configuring uv binary with command line argument 
 
+Refuse installation on script name collision
+
 
 # Desired features
 
