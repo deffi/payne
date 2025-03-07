@@ -118,17 +118,19 @@ class TestTestData:
             env["UV_INDEX"] = f"payne_test_data={test_data_index_url_files}"
 
             # Run the command as a tool
-            # Uv may output messages on stderr.
             try:
-                output = subprocess.check_output(
+                result = subprocess.run(
                     ["uv", "tool", "run", "--from", project, script],
                     cwd=project,
                     env=env,
+                    stdout=subprocess.PIPE,
                     stderr=subprocess.PIPE,
                     encoding="utf-8",
                     universal_newlines=True,
+                    check=True,
                 )
-                assert output == expected_output(name, version, False, script)
+                assert result.stdout == expected_output(name, version, False, script)
+                # Uv may output messages on stderr
             except subprocess.CalledProcessError as e:
                 print(e.stdout)
                 print(e.stderr)
