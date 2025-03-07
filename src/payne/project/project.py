@@ -21,6 +21,9 @@ class Project:
     def root(self):
         return self._root
 
+    def __str__(self):
+        return str(self._root)
+
     @cache
     def _pyproject(self) -> Pyproject:
         return Pyproject.load(self._root / "pyproject.toml")
