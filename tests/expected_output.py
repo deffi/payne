@@ -39,12 +39,12 @@ _expected_output = {
     ("dyn", "3.1.0", _T, "dyn"): "This is dyn 3.1.0\n",
 
     # dep 4.1.0: pygments constrained
-    ("dep", "4.1.0", _F, "dep"): "This is dep 4.1.0\nThis is pygments 2.1\n",
-    ("dep", "4.1.0", _T, "dep"): "This is dep 4.1.0\nThis is pygments 2.0\n",
+    ("dep", "4.1.0", _F, "dep"): "This is dep 4.1.0\nThis is pygments 2.19.1\n",
+    ("dep", "4.1.0", _T, "dep"): "This is dep 4.1.0\nThis is pygments 2.19.0\n",
 
     # dep 4.1.1: pygments pinned
-    ("dep", "4.1.1", _F, "dep"): "This is dep 4.1.1\nThis is pygments 2.0\n",
-    ("dep", "4.1.1", _T, "dep"): "This is dep 4.1.1\nThis is pygments 2.0\n",
+    ("dep", "4.1.1", _F, "dep"): "This is dep 4.1.1\nThis is pygments 2.19.0\n",
+    ("dep", "4.1.1", _T, "dep"): "This is dep 4.1.1\nThis is pygments 2.19.0\n",
 }
 
 

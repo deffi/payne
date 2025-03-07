@@ -11,13 +11,13 @@ dependencies = [
 ]
 
 [package.metadata]
-requires-dist = [{ name = "pygments", specifier = "==2.0" }]
+requires-dist = [{ name = "pygments", specifier = "==2.19.0" }]
 
 [[package]]
 name = "pygments"
-version = "2.0"
+version = "2.19.0"
 source = { registry = "https://pypi.org/simple" }
-sdist = { url = "https://files.pythonhosted.org/packages/ba/ed/8f57fa7c35648dd2954d8b677fb07427d75a4497ec242ce64256bbcfda78/Pygments-2.0.tar.gz", hash = "sha256:4de23e88eeb7570e0425270d1013deff6343d78776dd38aeaf26c98ec3552421", size = 2710276 }
+sdist = { url = "https://files.pythonhosted.org/packages/d3/c0/9c9832e5be227c40e1ce774d493065f83a91d6430baa7e372094e9683a45/pygments-2.19.0.tar.gz", hash = "sha256:afc4146269910d4bdfabcd27c24923137a74d562a23a320a41a55ad303e19783", size = 4967733 }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/b0/df/f3b9f10d4bdad8c9831ae234972fdd48b14c94bfd808240e0ecb306932a4/Pygments-2.0-py3-none-any.whl", hash = "sha256:90889e55af788d0a53c470fd1a324a9b7090cf4811e84de5e967dea9878a5fb6", size = 672416 },
+    { url = "https://files.pythonhosted.org/packages/20/dc/fde3e7ac4d279a331676829af4afafd113b34272393d73f610e8f0329221/pygments-2.19.0-py3-none-any.whl", hash = "sha256:4755e6e64d22161d5b61432c0600c923c5927214e7c956e31c23923c89251a9b", size = 1225305 },
 ]
