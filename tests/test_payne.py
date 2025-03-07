@@ -38,15 +38,16 @@ class TestPayne:
 
         return script_files
 
+    @pytest.mark.parametrize("locked", [False, True])
     @pytest.mark.parametrize("source", ["package", "project"])
-    def test_install_uninstall(self, source):
+    def test_install_uninstall(self, source, locked):
         with TemporaryDirectory() as temp_dir:
             def install_app(name: str, version: str):
                 match source:
                     case "project":
-                        payne.install_project(test_data / f"{name}-{version}", locked=False, reinstall=False)
+                        payne.install_project(test_data / f"{name}-{version}", locked=locked, reinstall=False)
                     case "package":
-                        payne.install_package(name, version, locked=False, reinstall=False)
+                        payne.install_package(name, version, locked=locked, reinstall=False)
                     case _:
                         assert False
 
@@ -78,9 +79,9 @@ class TestPayne:
 
             # Run the scripts
             # Windows will automatically use the .exe
-            assert process_output([bin_dir / "foo-1.3.0"]) == (expected_output("foo", "1.3.0", False, "foo"), "")
-            assert process_output([bin_dir / "foo-1.3.1"]) == (expected_output("foo", "1.3.1", False, "foo"), "")
-            assert process_output([bin_dir / "foo-1.3.2"]) == (expected_output("foo", "1.3.2", False, "foo"), "")
+            assert process_output([bin_dir / "foo-1.3.0"]) == (expected_output("foo", "1.3.0", locked, "foo"), "")
+            assert process_output([bin_dir / "foo-1.3.1"]) == (expected_output("foo", "1.3.1", locked, "foo"), "")
+            assert process_output([bin_dir / "foo-1.3.2"]) == (expected_output("foo", "1.3.2", locked, "foo"), "")
 
             # Uninstall foo 1.3.0
             payne.uninstall("foo", "1.3.0")
