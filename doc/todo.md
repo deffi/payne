@@ -1,7 +1,5 @@
 # Next 
 
-Test installing from local index with dependency from PyPI (test project `dep`)
-
 # Essential
 
 Identify paths like uv (`uv tool install`):
