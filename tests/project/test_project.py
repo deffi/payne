@@ -8,6 +8,8 @@ from common import test_data
 
 
 class TestProject():
+    # TODO only sup is slow, the others are fast
+    @pytest.mark.slow
     @pytest.mark.parametrize("directory, name, version", [
         ("foo-1.3.0", "foo", "1.3.0"),
         ("foo-1.3.1", "foo", "1.3.1"),

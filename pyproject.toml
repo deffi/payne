@@ -61,5 +61,6 @@ exclude = [
 [tool.pytest.ini_options]
 markers = [
     "test_data: tests related to the test data",
+    "slow: tests than take significant time",
 ]
 pythonpath = "tests"

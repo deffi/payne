@@ -29,6 +29,7 @@ class TestTestData:
     #    * Re-write the lockfile to the new index
     #    * Ask the `uv` maintainers for a way to re-lock to a different index
     #      URL without upgrading
+    @pytest.mark.slow
     @pytest.mark.parametrize("name, version, script", [
         #                                   Project version
         #                                   |                  Dependency versions
@@ -96,6 +97,7 @@ class TestTestData:
     # honored and all dependencies will be at the latest version, unless pinned
     # in the project. The project version (first line) will be the one from the
     # project.
+    @pytest.mark.slow
     @pytest.mark.parametrize("name, version, script", [
         ("baz", "1.1.0", "baz"),
         ("baz", "1.1.1", "baz"),

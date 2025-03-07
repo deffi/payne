@@ -9,6 +9,7 @@ from payne.util.file_system import TemporaryDirectory
 
 
 class TestDownload:
+    @pytest.mark.slow
     @pytest.mark.parametrize("package", [
         Package("payne", "0.1.0"),
         Package("foo", "1.3.1"),

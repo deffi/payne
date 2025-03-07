@@ -38,6 +38,7 @@ class TestPayne:
 
         return script_files
 
+    @pytest.mark.slow
     @pytest.mark.parametrize("locked", [False, True])
     @pytest.mark.parametrize("source", ["package", "project"])
     def test_install_uninstall(self, source, locked):
@@ -101,6 +102,7 @@ class TestPayne:
             assert self.installed_apps(apps_dir) == {}
             assert self.installed_scripts(bin_dir) == set()
 
+    @pytest.mark.slow
     @pytest.mark.parametrize("source", ["package", "project"])
     @pytest.mark.parametrize("name, version, locked, script", [
         # baz 1.1.0
@@ -159,6 +161,7 @@ class TestPayne:
             expected = expected_output(name, version, locked, script)
             assert process_output([bin_dir / f"{script}-{version}"]) == (expected, "")
 
+    @pytest.mark.slow
     @pytest.mark.parametrize("source", ["package", "project"])
     @pytest.mark.parametrize("name, version, locked", [
         ("sup", "2.1.0", True),
