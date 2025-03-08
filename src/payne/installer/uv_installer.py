@@ -1,8 +1,10 @@
 import os
 from pathlib import Path
 import shlex
+import shutil
 import subprocess
 
+from payne.config import config
 from payne.project import Project
 from payne.package import Package
 from payne.installer import Installer
@@ -24,7 +26,7 @@ class UvInstaller(Installer):
         # have raised an exception, but uv doesn't return an error code in this
         # case.
         args = [
-            "uv",
+            shutil.which(config().uv),
             "tool",
             "install",
             "--reinstall",

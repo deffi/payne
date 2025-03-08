@@ -1,7 +1,9 @@
 from pathlib import Path
 import shlex
+import shutil
 import subprocess
 
+from payne.config import config
 from payne.project.build_frontend import Frontend
 
 
@@ -11,7 +13,7 @@ class UvFrontend(Frontend):
         assert not constraints_file.exists()
 
         args = [
-            "uv",
+            shutil.which(config().uv),
             "export",
             "--project", self._root,
             "--no-dev",

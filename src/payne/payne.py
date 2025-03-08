@@ -4,6 +4,7 @@ import shutil
 
 
 from payne.app import AppVersion, AppsDir
+from payne.config import config
 from payne.downloader import Downloader
 from payne.exceptions import AppVersionAlreadyInstalled, FrontendNotRecognized
 from payne.installer import UvInstaller
@@ -13,32 +14,19 @@ from payne.util.file_system import TemporaryDirectory
 
 
 class Payne:
-    # TODO get rid of defaults
-    def __init__(
-            self,
-            apps_dir: Path = Path.home() / ".local" / "share" / "payne" / "apps",  # TODO better
-            bin_dir: Path = Path.home() / ".local" / "bin",  # TODO better
-            package_indices: dict[str, str] = None,  # TODO remove default
-            ):
-        self._apps_dir = AppsDir(apps_dir)
-        self._bin_dir = bin_dir
-        self._package_indices = package_indices or {}
+    def __init__(self):
+        assert config() is not None
 
-    @property
+    @cached_property
     def apps_dir(self) -> AppsDir:
-        return self._apps_dir
+        return AppsDir(config().apps_dir)
 
-    @cached_property
-    def bin_dir(self):
-        return self._bin_dir
-
-    @cached_property
-    def uv_binary(self) -> Path:
-        return Path(shutil.which("uv"))  # TODO better
-
-    def status(self):
-        print(f"Apps directory: {self.apps_dir.root}")
-        print(f"Bin directory:  {self.bin_dir}")
+    @staticmethod
+    def status():
+        print(f"Apps directory:  {config().apps_dir}")
+        print(f"Bin directory:   {config().bin_dir}")
+        print(f"Package indices: {config().package_indices}")  # TODO show as list
+        print(f"Uv executable:   {config().uv}")  # TODO show resolved value
 
     def install(self, source: Project | Package, *, locked: bool, reinstall: bool):
         with TemporaryDirectory() as temp_dir:
@@ -73,7 +61,7 @@ class Payne:
 
                     case Package() as package:
                         download_dir = temp_dir / "download"
-                        sdist = Downloader().download_and_unpack_sdist(package, download_dir, self._package_indices)
+                        sdist = Downloader().download_and_unpack_sdist(package, download_dir, config().package_indices)
                         temp_project = Project(sdist)
 
                         frontend = temp_project.build_frontend()
@@ -95,10 +83,10 @@ class Payne:
                 case _:
                     raise TypeError(f"Unhandled source: {source}")
 
-            installer = UvInstaller(self._package_indices)
+            installer = UvInstaller(config().package_indices)
 
             with self.apps_dir.cleanup_app_dir(app_version.name):
-                app_version.install(installer, source, self.bin_dir, constraints_file)
+                app_version.install(installer, source, config().bin_dir, constraints_file)
 
     def install_project(self, root: Path, *, locked: bool, reinstall: bool):
         self.install(Project(root), locked=locked, reinstall=reinstall)

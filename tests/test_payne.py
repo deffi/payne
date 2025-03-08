@@ -1,7 +1,7 @@
 import os
 from pathlib import Path
 
-from payne import Payne
+from payne import Payne, Config
 from payne.util.file_system import TemporaryDirectory
 from payne.exceptions import FrontendNotRecognized
 
@@ -55,52 +55,54 @@ class TestPayne:
             apps_dir = temp_dir / "apps"
             bin_dir = temp_dir / "bin"
 
-            payne = Payne(apps_dir, bin_dir, {"payne_test_data": test_data_index_url_files})
+            # TODO can we use a fixture for this?
+            with Config(apps_dir=apps_dir, bin_dir=bin_dir, package_indices={"payne_test_data": test_data_index_url_files}, uv="uv"):
+                payne = Payne()
 
-            # Install foo 1.3.0
-            install_app("foo", "1.3.0")
-            assert self.installed_apps(apps_dir) == {"foo": {"1.3.0"}}
-            assert self.installed_scripts(bin_dir) == {"foo-1.3.0"}
-            self.assert_app_valid(apps_dir, "foo", "1.3.0")
+                # Install foo 1.3.0
+                install_app("foo", "1.3.0")
+                assert self.installed_apps(apps_dir) == {"foo": {"1.3.0"}}
+                assert self.installed_scripts(bin_dir) == {"foo-1.3.0"}
+                self.assert_app_valid(apps_dir, "foo", "1.3.0")
 
-            # Install foo 1.3.1
-            install_app("foo", "1.3.1")
-            assert self.installed_apps(apps_dir) == {"foo": {"1.3.0", "1.3.1"}}
-            assert self.installed_scripts(bin_dir) == {"foo-1.3.0", "foo-1.3.1"}
-            self.assert_app_valid(apps_dir, "foo", "1.3.0")
-            self.assert_app_valid(apps_dir, "foo", "1.3.1")
+                # Install foo 1.3.1
+                install_app("foo", "1.3.1")
+                assert self.installed_apps(apps_dir) == {"foo": {"1.3.0", "1.3.1"}}
+                assert self.installed_scripts(bin_dir) == {"foo-1.3.0", "foo-1.3.1"}
+                self.assert_app_valid(apps_dir, "foo", "1.3.0")
+                self.assert_app_valid(apps_dir, "foo", "1.3.1")
 
-            # Install foo 1.3.2
-            install_app("foo", "1.3.2")
-            assert self.installed_apps(apps_dir) == {"foo": {"1.3.0", "1.3.1", "1.3.2"}}
-            assert self.installed_scripts(bin_dir) == {"foo-1.3.0", "foo-1.3.1", "foo-1.3.2"}
-            self.assert_app_valid(apps_dir, "foo", "1.3.0")
-            self.assert_app_valid(apps_dir, "foo", "1.3.1")
-            self.assert_app_valid(apps_dir, "foo", "1.3.2")
+                # Install foo 1.3.2
+                install_app("foo", "1.3.2")
+                assert self.installed_apps(apps_dir) == {"foo": {"1.3.0", "1.3.1", "1.3.2"}}
+                assert self.installed_scripts(bin_dir) == {"foo-1.3.0", "foo-1.3.1", "foo-1.3.2"}
+                self.assert_app_valid(apps_dir, "foo", "1.3.0")
+                self.assert_app_valid(apps_dir, "foo", "1.3.1")
+                self.assert_app_valid(apps_dir, "foo", "1.3.2")
 
-            # Run the scripts
-            # Windows will automatically use the .exe
-            assert process_output([bin_dir / "foo-1.3.0"]) == (expected_output("foo", "1.3.0", locked, "foo"), "")
-            assert process_output([bin_dir / "foo-1.3.1"]) == (expected_output("foo", "1.3.1", locked, "foo"), "")
-            assert process_output([bin_dir / "foo-1.3.2"]) == (expected_output("foo", "1.3.2", locked, "foo"), "")
+                # Run the scripts
+                # Windows will automatically use the .exe
+                assert process_output([bin_dir / "foo-1.3.0"]) == (expected_output("foo", "1.3.0", locked, "foo"), "")
+                assert process_output([bin_dir / "foo-1.3.1"]) == (expected_output("foo", "1.3.1", locked, "foo"), "")
+                assert process_output([bin_dir / "foo-1.3.2"]) == (expected_output("foo", "1.3.2", locked, "foo"), "")
 
-            # Uninstall foo 1.3.0
-            payne.uninstall("foo", "1.3.0")
-            assert self.installed_apps(apps_dir) == {"foo": {"1.3.1", "1.3.2"}}
-            assert self.installed_scripts(bin_dir) == {"foo-1.3.1", "foo-1.3.2"}
-            self.assert_app_valid(apps_dir, "foo", "1.3.1")
-            self.assert_app_valid(apps_dir, "foo", "1.3.2")
+                # Uninstall foo 1.3.0
+                payne.uninstall("foo", "1.3.0")
+                assert self.installed_apps(apps_dir) == {"foo": {"1.3.1", "1.3.2"}}
+                assert self.installed_scripts(bin_dir) == {"foo-1.3.1", "foo-1.3.2"}
+                self.assert_app_valid(apps_dir, "foo", "1.3.1")
+                self.assert_app_valid(apps_dir, "foo", "1.3.2")
 
-            # Uninstall foo 1.3.1
-            payne.uninstall("foo", "1.3.1")
-            assert self.installed_apps(apps_dir) == {"foo": {"1.3.2"}}
-            assert self.installed_scripts(bin_dir) == {"foo-1.3.2"}
-            self.assert_app_valid(apps_dir, "foo", "1.3.2")
+                # Uninstall foo 1.3.1
+                payne.uninstall("foo", "1.3.1")
+                assert self.installed_apps(apps_dir) == {"foo": {"1.3.2"}}
+                assert self.installed_scripts(bin_dir) == {"foo-1.3.2"}
+                self.assert_app_valid(apps_dir, "foo", "1.3.2")
 
-            # Uninstall foo 1.3.2
-            payne.uninstall("foo", "1.3.2")
-            assert self.installed_apps(apps_dir) == {}
-            assert self.installed_scripts(bin_dir) == set()
+                # Uninstall foo 1.3.2
+                payne.uninstall("foo", "1.3.2")
+                assert self.installed_apps(apps_dir) == {}
+                assert self.installed_scripts(bin_dir) == set()
 
     @pytest.mark.slow
     @pytest.mark.parametrize("source", ["package", "project"])
@@ -144,22 +146,23 @@ class TestPayne:
             apps_dir = temp_dir / "apps"
             bin_dir = temp_dir / "bin"
 
-            payne = Payne(apps_dir, bin_dir, {"payne_test_data": test_data_index_url_files})
+            with Config(apps_dir=apps_dir, bin_dir=bin_dir, package_indices={"payne_test_data": test_data_index_url_files}, uv="uv"):
+                payne = Payne()
 
-            match source:
-                case "project":
-                    payne.install_project(test_data / f"{name}-{version}", locked=locked, reinstall=False)
-                case "package":
-                    payne.install_package(name, version, locked=locked, reinstall=False)
-                case _:
-                    assert False
+                match source:
+                    case "project":
+                        payne.install_project(test_data / f"{name}-{version}", locked=locked, reinstall=False)
+                    case "package":
+                        payne.install_package(name, version, locked=locked, reinstall=False)
+                    case _:
+                        assert False
 
-            assert self.installed_apps(apps_dir) == {name: {version}}
-            assert self.installed_scripts(bin_dir) == {f"{script}-{version}"}
-            self.assert_app_valid(apps_dir, name, version)
+                assert self.installed_apps(apps_dir) == {name: {version}}
+                assert self.installed_scripts(bin_dir) == {f"{script}-{version}"}
+                self.assert_app_valid(apps_dir, name, version)
 
-            expected = expected_output(name, version, locked, script)
-            assert process_output([bin_dir / f"{script}-{version}"]) == (expected, "")
+                expected = expected_output(name, version, locked, script)
+                assert process_output([bin_dir / f"{script}-{version}"]) == (expected, "")
 
     @pytest.mark.slow
     @pytest.mark.parametrize("source", ["package", "project"])
@@ -171,13 +174,14 @@ class TestPayne:
             apps_dir = temp_dir / "apps"
             bin_dir = temp_dir / "bin"
 
-            payne = Payne(apps_dir, bin_dir, {"payne_test_data": test_data_index_url_files})
+            with Config(apps_dir=apps_dir, bin_dir=bin_dir, package_indices={"payne_test_data": test_data_index_url_files}, uv="uv"):
+                payne = Payne()
 
-            with pytest.raises(FrontendNotRecognized):
-                match source:
-                    case "project":
-                        payne.install_project(test_data / f"{name}-{version}", locked=locked, reinstall=False)
-                    case "package":
-                        payne.install_package(name, version, locked=locked, reinstall=False)
-                    case _:
-                        assert False
+                with pytest.raises(FrontendNotRecognized):
+                    match source:
+                        case "project":
+                            payne.install_project(test_data / f"{name}-{version}", locked=locked, reinstall=False)
+                        case "package":
+                            payne.install_package(name, version, locked=locked, reinstall=False)
+                        case _:
+                            assert False

@@ -1,5 +1,14 @@
 # Next 
 
+Try that module-replacement hack so we can do `from Payne import config` and
+use `config` and still get the correct thing (lookup of the global for every
+access). We also want to be able to access Config.
+
+Are we installing the `uv` package, and are we using it?
+
+Allow `payne --bin-dir ... status`
+
+
 # Essential
 
 Identify paths like uv (`uv tool install`):
@@ -8,8 +17,6 @@ Identify paths like uv (`uv tool install`):
   * bin directory: ~/.local/bin
 
 Warn if the bin directory isn't in PATH
-
-Allow configuring uv binary with command line argument 
 
 Refuse installation on script name collision
 
@@ -59,6 +66,11 @@ Example error message from uv:
 
 payne list: metadata could not be loaded
 
+payne install: no version specified
+
+Specified uv does not exit 
+
+
 # Nice to have features
 
 Configuration
@@ -93,6 +105,10 @@ Colored output (with rich)
 App version metadata:
   * From where the app was installed
     * If from a project, whether it was built
+
+payne config edit (like pip)
+
+Payne status: show where 
 
 
 # Robustness
