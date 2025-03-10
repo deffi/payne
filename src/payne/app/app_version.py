@@ -1,6 +1,7 @@
 from collections.abc import Iterator
 from functools import cached_property
 import json
+import os
 from pathlib import Path
 import shutil
 
@@ -45,6 +46,12 @@ class AppVersion:
                 script,
                 source_script.name,
                 app_version_metadata.create_hash(script.read_bytes()))
+
+        # TODO factor out
+        search_path = os.environ["PATH"].split(os.pathsep)
+        search_path = [p.lower() for p in search_path]
+        if str(bin_dir).lower() not in search_path:
+            print(f"Warning: the bin directory is not in the PATH: {bin_dir}")
 
     # Installation #############################################################
 
