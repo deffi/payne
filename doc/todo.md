@@ -2,12 +2,11 @@
 
 # Essential
 
-Identify paths like uv (`uv tool install`):
+Identify paths like uv (`uv tool install`; XDG standard):
   * Apps directory
     * Unix: ~/.local/share/payne/apps
   * bin directory: ~/.local/bin
-
-Warn if the bin directory isn't in PATH
+  * https://docs.astral.sh/uv/reference/cli/#uv-tool-dir
 
 Refuse installation on script name collision
 
@@ -62,6 +61,8 @@ payne list: metadata could not be loaded
 payne install: no version specified
 
 Specified uv does not exit 
+
+Frontend not recognized: suggest `--no-locked`
 
 
 # Nice to have features
