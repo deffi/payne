@@ -1,8 +1,5 @@
 # Next 
 
-Allow `payne --bin-dir ... status`
-
-
 # Essential
 
 Identify paths like uv (`uv tool install`):
@@ -37,6 +34,8 @@ because it is generated from the files installed by uv.
 "Uninstall script" message is bad
 
 Find out why the GitHub Windows test jobs fail during cleanup and re-enable them
+
+Help texts for parameters
 
 
 # Error handling

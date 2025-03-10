@@ -42,7 +42,7 @@ issues = "https://github.com/deffi/payne/issues"
 repository = "https://github.com/deffi/payne.git"
 
 [project.scripts]
-payne = "payne.cli:app"
+payne = "payne.cli:main"
 
 [build-system]
 requires = ["hatchling"]
