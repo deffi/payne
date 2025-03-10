@@ -2,6 +2,7 @@ from dataclasses import dataclass
 from pathlib import Path
 from typing import Callable
 import os
+import sys
 
 
 @dataclass
@@ -51,7 +52,6 @@ class Config:
             package_indices: dict[str, str],
             uv: str | None,
     ):
-        print(os.environ)
         return Config(
             apps_dir=cls._value(apps_dir, ("PAYNE_APPS_DIR", Path), cls._default_apps_dir()),
             bin_dir=cls._value(bin_dir, ("PAYNE_BIN_DIR", Path), cls._default_bin_dir()),
