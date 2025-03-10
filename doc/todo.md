@@ -1,11 +1,5 @@
 # Next 
 
-Try that module-replacement hack so we can do `from Payne import config` and
-use `config` and still get the correct thing (lookup of the global for every
-access). We also want to be able to access Config.
-
-Are we installing the `uv` package, and are we using it?
-
 Allow `payne --bin-dir ... status`
 
 
