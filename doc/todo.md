@@ -4,9 +4,20 @@
 
 Identify paths like uv (`uv tool install`; XDG standard):
   * Apps directory
-    * Unix: ~/.local/share/payne/apps
-  * bin directory: ~/.local/bin
+      * $PAYNE_APPS_DIR
+      * $XDG_DATA_HOME/payne/apps (Linux)
+      * $HOME/.local/share/payne/apps (Linux)
+        $APPDATA or $LOCALAPPDATA? / payne/apps (Windows) How does uv?
+  * bin directory:
+      * $PAYNE_BIN_DIR
+      * $XDG_BIN_HOME (not really in the XDG spec, but quite common)
+      * $XDG_DATA_HOME/../bin
+      * $HOME/.local/bin (Linux)
+        $USERPROFILE/.local/bin (Windows) 
   * https://docs.astral.sh/uv/reference/cli/#uv-tool-dir
+  * https://specifications.freedesktop.org/basedir-spec/latest/
+  * platformdirs package?
+  * xdg-base-dirs? pyxdg?
 
 Refuse installation on script name collision
 
@@ -36,6 +47,12 @@ Find out why the GitHub Windows test jobs fail during cleanup and re-enable them
 
 Help texts for parameters
 
+Configuration file:
+  * $XDG_CONFIG_HOME/uv/uv.toml
+  * ($XDG_CONFIG_DIRS)/uv/uv.toml
+  * File name TBD
+  * $HOME/.config/payne/payne.toml (Linux)
+    $APPDATA/payne/payne.toml (Windows)
 
 # Error handling
 
