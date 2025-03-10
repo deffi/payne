@@ -40,6 +40,7 @@ class Script:
     hash: str
 
 
+# TODO cf. uv-receipt.toml
 @define
 class AppVersionMetadata:
     # source: ProjectSource | PackageSource
