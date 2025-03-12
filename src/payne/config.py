@@ -4,6 +4,8 @@ from typing import Callable
 import os
 import sys
 
+import platformdirs
+
 
 @dataclass
 class Config:
@@ -24,12 +26,25 @@ class Config:
 
     @staticmethod
     def _default_apps_dir() -> Path:
-        # TODO better
-        return Path.home() / ".local" / "share" / "payne" / "apps"
+        return Path(platformdirs.user_data_dir("payne", False)) /  "apps"
 
     @staticmethod
     def _default_bin_dir() -> Path:
-        # TODO better
+        # Platformdirs doesn't support this, so we'll have to do it ourselves.
+
+        # `$XDG_BIN_HOME`. This isn't really in the XDG spec, but it seems quite
+        # common.
+        if "XDG_BIN_HOME" in os.environ:
+            return Path(os.environ["XDG_BIN_HOME"])
+
+        # `$XDG_DATA_HOME/../bin`. We don't use `platformdirs.user_data_dir`
+        # here because on Windows, that's not what we want.
+        if "XDG_DATA_HOME" in os.environ:
+            return Path(os.environ["XDG_DATA_HOME"]).parent / "bin"
+
+        # `~/.local/bin`. Reasonable on Linux, questionable on Windows - but
+        # there doesn't seem to be a common bin directory on Windows and this is
+        # what uv is doing.
         return Path.home() / ".local" / "bin"
 
     @staticmethod

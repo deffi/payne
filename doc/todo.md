@@ -2,23 +2,6 @@
 
 # Essential
 
-Identify paths like uv (`uv tool install`; XDG standard):
-  * Apps directory
-      * $PAYNE_APPS_DIR
-      * $XDG_DATA_HOME/payne/apps (Linux)
-      * $HOME/.local/share/payne/apps (Linux)
-        $APPDATA or $LOCALAPPDATA? / payne/apps (Windows) How does uv?
-  * bin directory:
-      * $PAYNE_BIN_DIR
-      * $XDG_BIN_HOME (not really in the XDG spec, but quite common)
-      * $XDG_DATA_HOME/../bin
-      * $HOME/.local/bin (Linux)
-        $USERPROFILE/.local/bin (Windows) 
-  * https://docs.astral.sh/uv/reference/cli/#uv-tool-dir
-  * https://specifications.freedesktop.org/basedir-spec/latest/
-  * platformdirs package?
-  * xdg-base-dirs? pyxdg?
-
 Refuse installation on script name collision
 
 
